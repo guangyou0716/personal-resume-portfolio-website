@@ -10,7 +10,7 @@ const editableStringFields = [
   "focus", "email", "bio", "summary",
 ] as const;
 
-export async function getProfile(): Promise<typeof profile & Pick<EditableProfile, "experience" | "skillGroups" | "education">> {
+export async function getProfile(): Promise<typeof profile & Pick<EditableProfile, "experience" | "skillGroups" | "education" | "githubCovers">> {
   try {
     const [row] = await (await getDb()).select().from(portfolioProfile).where(eq(portfolioProfile.id, PROFILE_ROW_ID)).limit(1);
     if (!row) return defaultProfile();
@@ -23,6 +23,7 @@ export async function getProfile(): Promise<typeof profile & Pick<EditableProfil
       experience: Array.isArray(saved.experience) ? saved.experience : experience,
       skillGroups: Array.isArray(saved.skillGroups) ? saved.skillGroups : skillGroups,
       education: Array.isArray(saved.education) ? saved.education : education,
+      githubCovers: parseGitHubCovers(saved.githubCovers ?? {}),
     };
   } catch {
     return defaultProfile();
@@ -58,6 +59,7 @@ export function parseEditableProfile(input: unknown): EditableProfile {
     experience: parseExperience(value.experience ?? experience),
     skillGroups: parseSkillGroups(value.skillGroups ?? skillGroups),
     education: parseEducation(value.education ?? education),
+    githubCovers: parseGitHubCovers(value.githubCovers ?? {}),
   };
 }
 
@@ -135,7 +137,17 @@ function pickSavedProfile(saved: Partial<EditableProfile>) {
 }
 
 function defaultProfile() {
-  return { ...profile, experience, skillGroups, education };
+  return { ...profile, experience, skillGroups, education, githubCovers: {} };
+}
+
+function parseGitHubCovers(value: unknown): Record<string, string> {
+  if (!isRecord(value) || Object.keys(value).length > 50) throw new Error("Invalid GitHub covers");
+  return Object.fromEntries(Object.entries(value).map(([name, cover]) => {
+    if (!name || name.length > 200 || typeof cover !== "string" || cover.length > 2000) throw new Error("Invalid GitHub cover");
+    const trimmed = cover.trim();
+    if (trimmed && !/^(https?:\/\/|\/)/.test(trimmed)) throw new Error("Invalid GitHub cover URL");
+    return [name, trimmed];
+  }));
 }
 
 function parseExperience(value: unknown): ExperienceItem[] {

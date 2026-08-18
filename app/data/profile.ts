@@ -59,6 +59,7 @@ export const profile = {
     linkedin: "https://www.linkedin.com/in/your-username",
     email: "mailto:you@example.com",
   } satisfies SocialLinks,
+  githubCovers: {} as Record<string, string>,
 };
 
 export type EditableProfile = {
@@ -78,6 +79,7 @@ export type EditableProfile = {
   experience: ExperienceItem[];
   skillGroups: SkillGroup[];
   education: EducationItem[];
+  githubCovers: Record<string, string>;
 };
 
 export const experience: ExperienceItem[] = [

@@ -32,7 +32,8 @@ export function SectionHeading({ index, title, action }: { index: string; title:
   return <div className="section-heading"><div className="section-heading__title"><span className="section-index">{index}</span><h2>{title}</h2></div>{action}</div>;
 }
 
-export function ProjectPreview({ project, compact = false }: { project: Pick<ProjectItem, "slug" | "type">; compact?: boolean }) {
+export function ProjectPreview({ project, compact = false }: { project: Pick<ProjectItem, "slug" | "type" | "coverImage">; compact?: boolean }) {
+  if (project.coverImage) return <div className={`project-visual project-visual--cover ${compact ? "project-visual--compact" : ""}`}><img src={project.coverImage} alt="Project cover" /></div>;
   return <div className={`project-visual project-visual--${project.slug} ${compact ? "project-visual--compact" : ""}`} aria-label="Project screenshot placeholder"><div className="mock-window-bar"><span /><span /><span /><em>{project.type}</em></div><div className="mock-window-content"><div className="mock-sidebar"><span /><span /><span /><span /></div><div className="mock-main"><div className="mock-heading" /><div className="mock-row"><span /><span /><span /></div><div className="mock-chart"><i /><i /><i /><i /><i /></div><div className="mock-row mock-row--short"><span /><span /></div></div></div><span className="mock-replace">Replace with screenshot</span></div>;
 }
 
