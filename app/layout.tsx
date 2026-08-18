@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 import SiteInteractions from "./site-interactions";
-import { profile } from "./data/profile";
+import { getProfile } from "./data/profile-server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
+  const profile = await getProfile();
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
   const protocol = (requestHeaders.get("x-forwarded-proto") ?? "http").split(",")[0];
   const metadataBase = new URL(`${protocol}://${host}`);

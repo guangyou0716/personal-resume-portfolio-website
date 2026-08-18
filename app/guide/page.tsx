@@ -5,8 +5,8 @@ import { SiteFooter, SiteHeader } from "../components";
 export const metadata: Metadata = { title: "Customize guide", description: "Private maintenance guide for updating this personal resume site." };
 
 const guideItems = [
-  ["Change my name", "Open app/data/profile.ts and update profile.name plus profile.initials."],
-  ["Change the introduction", "Update profile.title, profile.subtitle, profile.bio and profile.summary in the same file."],
+  ["Open the editor", "Visit /customize and sign in with the site owner account. Changes are saved for the public site."],
+  ["Change the introduction", "Use the private editor for your name, title, location, bio, summary, values and contact links."],
   ["Add experience", "Add another object to the experience array. The homepage and Quick Resume page update automatically."],
   ["Add a project", "Add one ProjectItem object to projects. Use a unique slug; the project card and detail page are generated for you."],
   ["Add project screenshots", "Put image files in public/projects, then add their paths to coverImage and screenshots."],

@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Icon, ProjectPreview, SiteFooter, SiteHeader } from "../../components";
-import { profile, projects } from "../../data/profile";
+import { projects } from "../../data/profile";
+import { getProfile } from "../../data/profile-server";
 
 export function generateStaticParams() {
   return projects.map((project) => ({ slug: project.slug }));
 }
+
+export const dynamic = "force-dynamic";
 
 function getProject(slug: string) {
   return projects.find((project) => project.slug === slug);
@@ -15,6 +18,7 @@ function getProject(slug: string) {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const project = getProject(slug);
+  const profile = await getProfile();
   if (!project) return { title: "Project not found" };
   return {
     title: `${project.title} — ${profile.name}`,

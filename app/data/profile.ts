@@ -57,6 +57,21 @@ export const profile = {
   } satisfies SocialLinks,
 };
 
+export type EditableProfile = {
+  name: string;
+  initials: string;
+  title: string;
+  subtitle: string;
+  location: string;
+  availability: string;
+  focus: string;
+  email: string;
+  bio: string;
+  summary: string;
+  values: string[];
+  socials: SocialLinks;
+};
+
 export const experience: ExperienceItem[] = [
   {
     company: "[Company]", role: "[Job Title]", location: "[Location]", type: "[Employment Type]", startDate: "[Start Date]", endDate: "[End Date]",

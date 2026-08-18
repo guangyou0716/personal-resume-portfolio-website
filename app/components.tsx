@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ProjectItem } from "./data/profile";
 import { profile } from "./data/profile";
+import { getProfile } from "./data/profile-server";
 
 export function Icon({ name, size = 18 }: { name: string; size?: number }) {
   const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", xmlns: "http://www.w3.org/2000/svg", "aria-hidden": true } as const;
@@ -33,6 +34,7 @@ export function ProjectPreview({ project, compact = false }: { project: ProjectI
   return <div className={`project-visual project-visual--${project.slug} ${compact ? "project-visual--compact" : ""}`} aria-label="Project screenshot placeholder"><div className="mock-window-bar"><span /><span /><span /><em>{project.type}</em></div><div className="mock-window-content"><div className="mock-sidebar"><span /><span /><span /><span /></div><div className="mock-main"><div className="mock-heading" /><div className="mock-row"><span /><span /><span /></div><div className="mock-chart"><i /><i /><i /><i /><i /></div><div className="mock-row mock-row--short"><span /><span /></div></div></div><span className="mock-replace">Replace with screenshot</span></div>;
 }
 
-export function SiteFooter() {
-  return <footer className="site-footer"><div className="container site-footer__inner"><div><BrandMark /><p>{profile.title}</p></div><div className="footer-links"><a href={profile.socials.github}>GitHub</a><a href={profile.socials.linkedin}>LinkedIn</a><a href={profile.socials.email}>Email</a></div><p className="footer-note">Built with care.<br /><span>© {new Date().getFullYear()} {profile.name}</span></p></div></footer>;
+export async function SiteFooter() {
+  const currentProfile = await getProfile();
+  return <footer className="site-footer"><div className="container site-footer__inner"><div><BrandMark /><p>{currentProfile.title}</p></div><div className="footer-links"><a href={currentProfile.socials.github}>GitHub</a><a href={currentProfile.socials.linkedin}>LinkedIn</a><a href={currentProfile.socials.email}>Email</a></div><p className="footer-note">Built with care.<br /><span>© {new Date().getFullYear()} {currentProfile.name}</span></p></div></footer>;
 }

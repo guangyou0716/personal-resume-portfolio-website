@@ -1,12 +1,7 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon, ProjectPreview, SectionHeading, SiteFooter, SiteHeader } from "./components";
-import { certifications, education, experience, githubWork, isPlaceholderContent, profile, projects, skillGroups, workStyle } from "./data/profile";
-
-export const metadata: Metadata = {
-  title: `${profile.name} — ${profile.title}`,
-  description: profile.subtitle,
-};
+import { certifications, education, experience, githubWork, projects, skillGroups, workStyle } from "./data/profile";
+import { getProfile } from "./data/profile-server";
 
 const introCards = [
   ["What I Do", "Software development, automation and system integration."],
@@ -15,7 +10,10 @@ const introCards = [
   ["Current Focus", "AI-assisted development, automation and reliable software systems."],
 ];
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const profile = await getProfile();
   const featuredProjects = projects.filter((project) => project.featured);
 
   return <>
@@ -26,7 +24,7 @@ export default function Home() {
         <div className="hero-copy"><p className="eyebrow">{profile.focus}</p><h1>Hi, I&apos;m <span>{profile.name}</span>.<br /><strong>{profile.title}</strong></h1><p className="hero-lede">{profile.bio}</p><div className="hero-actions"><a className="button button--primary" href="#projects">View My Work <Icon name="arrow" /></a><a className="button button--secondary" href={profile.resumeFile}>Download Resume <Icon name="download" /></a></div><div className="hero-links"><a href={profile.socials.github}>GitHub <span>↗</span></a><a href={profile.socials.linkedin}>LinkedIn <span>↗</span></a><a href={profile.socials.email}>Email <span>↗</span></a></div><div className="hero-facts"><span>⌖ {profile.location}</span><span>● {profile.availability}</span><span>⚡ {profile.focus}</span></div></div>
       </section>
 
-      {isPlaceholderContent && <div className="placeholder-note container"><span>Demo content</span> Replace the details in <code>app/data/profile.ts</code> when you are ready.</div>}
+      {profile.name === "[Your Name]" && <div className="placeholder-note container"><span>Demo content</span> Open <code>/customize</code> to update the details when you are ready.</div>}
 
       <section className="section section--intro container" id="introduction"><SectionHeading index="01" title="A quick introduction" /><div className="intro-grid">{introCards.map(([title, text]) => <article className="intro-card" key={title}><h3>{title}</h3><p>{text}</p></article>)}</div></section>
 
