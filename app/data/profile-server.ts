@@ -56,9 +56,14 @@ export async function saveProfile(input: unknown) {
 
 export async function requireProfileEditor() {
   const user = await requireChatGPTUser("/customize");
-  const editorUserId = await getEditorUserId();
-  if (!editorUserId || user.userId !== editorUserId) notFound();
+  if (!(await isProfileEditor(user))) notFound();
   return user;
+}
+
+export async function isProfileEditor(user: { userId: string; email: string }) {
+  const editorUserId = await getEditorUserId();
+  const editorEmail = await getEditorEmail();
+  return Boolean((editorUserId && user.userId === editorUserId) || (editorEmail && user.email.toLowerCase() === editorEmail.toLowerCase()));
 }
 
 export async function getEditorUserId() {
@@ -67,6 +72,15 @@ export async function getEditorUserId() {
     return (env as unknown as Record<string, string | undefined>).PORTFOLIO_EDITOR_USER_ID ?? process.env.PORTFOLIO_EDITOR_USER_ID;
   } catch {
     return process.env.PORTFOLIO_EDITOR_USER_ID;
+  }
+}
+
+export async function getEditorEmail() {
+  try {
+    const { env } = await import("cloudflare:workers");
+    return (env as unknown as Record<string, string | undefined>).PORTFOLIO_EDITOR_EMAIL ?? process.env.PORTFOLIO_EDITOR_EMAIL;
+  } catch {
+    return process.env.PORTFOLIO_EDITOR_EMAIL;
   }
 }
 

@@ -1,10 +1,9 @@
 import { getChatGPTUser } from "../../chatgpt-auth";
-import { getEditorUserId, saveProfile } from "../../data/profile-server";
+import { isProfileEditor, saveProfile } from "../../data/profile-server";
 
 export async function POST(request: Request) {
   const user = await getChatGPTUser();
-  const editorUserId = await getEditorUserId();
-  if (!user || !editorUserId || user.userId !== editorUserId) {
+  if (!user || !(await isProfileEditor(user))) {
     return Response.json({ error: "Not authorized" }, { status: 401 });
   }
   const origin = request.headers.get("origin");
