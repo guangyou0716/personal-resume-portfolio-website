@@ -12,7 +12,7 @@ const guideItems = [
   ["Add project screenshots", "Put image files in public/projects, then add their paths to coverImage and screenshots."],
   ["Change skills", "Edit the skillGroups array. Categories and tags are rendered from that data."],
   ["Replace Resume PDF", "Add your file as public/resume.pdf, then change profile.resumeFile to /resume.pdf. The current link opens Quick Resume until you do this."],
-  ["Change profile picture", "Add your image under public/profile and replace the avatar placeholder in app/page.tsx when ready."],
+  ["Change profile picture", "Open /customize, paste an image URL into Avatar image URL, and save. For a local image, put it at public/profile/avatar.jpg and use /profile/avatar.jpg."],
   ["Change social links", "Edit profile.socials.github, profile.socials.linkedin and profile.socials.email."],
   ["Change theme accent", "Update --accent and --accent-soft at the top of app/globals.css."],
 ];

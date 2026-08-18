@@ -20,7 +20,7 @@ export default async function Home() {
     <SiteHeader active="About" />
     <main>
       <section className="hero container" id="about">
-        <div className="hero-avatar"><div className="avatar-ring"><span>{profile.initials}</span><Icon name="code" size={28} /></div><span className="availability-dot" /><p>{profile.availability}</p></div>
+        <div className="hero-avatar"><div className={`avatar-ring ${profile.avatar ? "avatar-ring--image" : ""}`}>{profile.avatar ? <img src={profile.avatar} alt={`${profile.name} profile`} /> : <span>{profile.initials}</span>}<span className="avatar-badge"><Icon name="code" size={15} /></span></div><span className="availability-dot" /><p>{profile.availability}</p></div>
         <div className="hero-copy"><p className="eyebrow">{profile.focus}</p><h1>Hi, I&apos;m <span>{profile.name}</span>.<br /><strong>{profile.title}</strong></h1><p className="hero-lede">{profile.bio}</p><div className="hero-actions"><a className="button button--primary" href="#projects">View My Work <Icon name="arrow" /></a><a className="button button--secondary" href={profile.resumeFile}>Download Resume <Icon name="download" /></a></div><div className="hero-links"><a href={profile.socials.github}>GitHub <span>↗</span></a><a href={profile.socials.linkedin}>LinkedIn <span>↗</span></a><a href={profile.socials.email}>Email <span>↗</span></a></div><div className="hero-facts"><span>⌖ {profile.location}</span><span>● {profile.availability}</span><span>⚡ {profile.focus}</span></div></div>
       </section>
 

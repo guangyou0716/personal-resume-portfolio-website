@@ -1,7 +1,7 @@
 # 001 — Gate hover lift to pointer devices
 
-- **Status**: TODO
-- **Commit**: UNCOMMITTED
+- **Status**: DONE
+- **Commit**: release commit
 - **Severity**: MEDIUM
 - **Category**: Accessibility
 - **Estimated scope**: 1 file, small CSS-only change
@@ -31,6 +31,8 @@ Keep the existing hover lift only for fine-pointer devices:
 ```
 
 The existing `.button:active { transform: scale(.97); }` remains the touch press feedback. Keep the existing reduced-motion media query.
+
+Implemented: primary/secondary buttons and project cards use the fine-pointer media query; contact cards retain their hover lift only on fine pointers and explicitly neutralize synthesized touch hover.
 
 ## Repo conventions to follow
 

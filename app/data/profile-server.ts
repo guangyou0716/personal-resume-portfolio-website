@@ -6,7 +6,7 @@ import { profile, type EditableProfile, type SocialLinks } from "./profile";
 
 const PROFILE_ROW_ID = "default";
 const editableStringFields = [
-  "name", "initials", "title", "subtitle", "location", "availability",
+  "name", "initials", "avatar", "title", "subtitle", "location", "availability",
   "focus", "email", "bio", "summary",
 ] as const;
 
@@ -28,6 +28,7 @@ export function parseEditableProfile(input: unknown): EditableProfile {
   for (const field of editableStringFields) {
     const item = value[field];
     if (typeof item !== "string" || item.length > 5000) throw new Error(`Invalid ${field}`);
+    if (field === "avatar" && item && !/^(https?:\/\/|\/)/.test(item.trim())) throw new Error("Invalid avatar URL");
     result[field] = item.trim();
   }
   const values = value.values;

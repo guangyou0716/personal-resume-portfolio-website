@@ -1,7 +1,7 @@
 # 002 — Give the mobile menu a short reveal
 
-- **Status**: TODO
-- **Commit**: UNCOMMITTED
+- **Status**: DONE
+- **Commit**: release commit
 - **Severity**: LOW
 - **Category**: Missed opportunity / physicality
 - **Estimated scope**: 1 file, small CSS-only change
@@ -44,6 +44,8 @@ On mobile, keep the menu in the layout flow but make entry and exit a small, int
 ```
 
 Keep `transform` and `opacity` as the moving properties, use the existing `--ease-out` token, and keep the 200ms duration under the UI budget. The existing global reduced-motion rule should shorten the transition; explicitly keep the open state visible without the translate if a focused feel-check shows movement is still present.
+
+Implemented with an absolutely positioned mobile menu so the closed state takes no layout space while the open/close transition remains an opacity/transform reveal.
 
 ## Repo conventions to follow
 

@@ -40,6 +40,7 @@ export type ProjectItem = {
 export const profile = {
   name: "[Your Name]",
   initials: "YN",
+  avatar: "",
   title: "Software Developer",
   subtitle: "Building practical systems, automation and AI-powered tools.",
   location: "[City, Country]",
@@ -60,6 +61,7 @@ export const profile = {
 export type EditableProfile = {
   name: string;
   initials: string;
+  avatar: string;
   title: string;
   subtitle: string;
   location: string;
