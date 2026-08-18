@@ -19,6 +19,7 @@ test("server-renders the portfolio homepage", async () => {
   const html = await response.text();
   assert.match(html, /<title>\[Your Name\] — Software Developer<\/title>/i);
   assert.match(html, /Featured Projects/);
+  assert.match(html, /Building practical systems, automation and AI-powered tools/);
   assert.match(html, /A quick introduction/);
   assert.match(html, /Let&apos;s Connect|Let's Connect/);
   assert.doesNotMatch(html, /Your site is taking shape|react-loading-skeleton|codex-preview/i);

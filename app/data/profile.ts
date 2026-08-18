@@ -15,6 +15,9 @@ export type ExperienceItem = {
   impact?: string;
 };
 
+export type SkillGroup = { label: string; items: string[] };
+export type EducationItem = { qualification: string; school: string; field: string; year: string; coursework: string };
+
 export type ProjectItem = {
   slug: string;
   title: string;
@@ -72,6 +75,9 @@ export type EditableProfile = {
   summary: string;
   values: string[];
   socials: SocialLinks;
+  experience: ExperienceItem[];
+  skillGroups: SkillGroup[];
+  education: EducationItem[];
 };
 
 export const experience: ExperienceItem[] = [
@@ -101,7 +107,7 @@ export const projects: ProjectItem[] = [
   },
 ];
 
-export const skillGroups = [
+export const skillGroups: SkillGroup[] = [
   { label: "Languages", items: ["Python", "C#", "JavaScript", "TypeScript", "SQL"] },
   { label: "Frameworks", items: [".NET", "Avalonia", "React", "Next.js"] },
   { label: "Backend & APIs", items: ["REST API", "JSON", "Authentication", "API Integration"] },
@@ -119,7 +125,7 @@ export const workStyle = [
   ["Use AI as an engineering tool", "I use AI to move faster while keeping implementation decisions reviewable."],
 ] as const;
 
-export const education = [{ qualification: "[Degree / Qualification]", school: "[University / College]", field: "[Field of Study]", year: "[Year]", coursework: "[Optional relevant coursework]" }];
+export const education: EducationItem[] = [{ qualification: "[Degree / Qualification]", school: "[University / College]", field: "[Field of Study]", year: "[Year]", coursework: "[Optional relevant coursework]" }];
 export const certifications: Array<{ name: string; issuer: string; date: string; link?: string }> = [];
 export const githubWork = [
   { name: "[Repository Name]", description: "[What this repository demonstrates]", stack: "[Language / Stack]", stars: "—" },

@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { requireChatGPTUser } from "../chatgpt-auth";
 import { portfolioProfile } from "../../db/schema";
-import { profile, type EditableProfile, type SocialLinks } from "./profile";
+import { education, experience, profile, skillGroups, type EditableProfile, type EducationItem, type ExperienceItem, type SkillGroup, type SocialLinks } from "./profile";
 
 const PROFILE_ROW_ID = "default";
 const editableStringFields = [
@@ -10,14 +10,22 @@ const editableStringFields = [
   "focus", "email", "bio", "summary",
 ] as const;
 
-export async function getProfile(): Promise<typeof profile> {
+export async function getProfile(): Promise<typeof profile & Pick<EditableProfile, "experience" | "skillGroups" | "education">> {
   try {
     const [row] = await (await getDb()).select().from(portfolioProfile).where(eq(portfolioProfile.id, PROFILE_ROW_ID)).limit(1);
-    if (!row) return profile;
+    if (!row) return defaultProfile();
     const saved = JSON.parse(row.content) as Partial<EditableProfile>;
-    return { ...profile, ...pickSavedProfile(saved), values: saved.values ?? profile.values, socials: { ...profile.socials, ...saved.socials } };
+    return {
+      ...profile,
+      ...pickSavedProfile(saved),
+      values: saved.values ?? profile.values,
+      socials: { ...profile.socials, ...saved.socials },
+      experience: Array.isArray(saved.experience) ? saved.experience : experience,
+      skillGroups: Array.isArray(saved.skillGroups) ? saved.skillGroups : skillGroups,
+      education: Array.isArray(saved.education) ? saved.education : education,
+    };
   } catch {
-    return profile;
+    return defaultProfile();
   }
 }
 
@@ -43,7 +51,14 @@ export function parseEditableProfile(input: unknown): EditableProfile {
     if (typeof links[field] !== "string" || links[field].length > 1000) throw new Error(`Invalid socials.${field}`);
     parsedSocials[field] = links[field].trim();
   }
-  return { ...result, values: values.map((item) => item.trim()).filter(Boolean), socials: parsedSocials };
+  return {
+    ...result,
+    values: values.map((item) => item.trim()).filter(Boolean),
+    socials: parsedSocials,
+    experience: parseExperience(value.experience ?? experience),
+    skillGroups: parseSkillGroups(value.skillGroups ?? skillGroups),
+    education: parseEducation(value.education ?? education),
+  };
 }
 
 export async function saveProfile(input: unknown) {
@@ -65,6 +80,32 @@ export async function isProfileEditor(user: { userId: string; email: string }) {
   const editorUserId = await getEditorUserId();
   const editorEmail = await getEditorEmail();
   return Boolean((editorUserId && user.userId === editorUserId) || (editorEmail && user.email.toLowerCase() === editorEmail.toLowerCase()));
+}
+
+export type GitHubRepository = { name: string; description: string; htmlUrl: string; language: string; stars: number };
+
+export async function getGitHubRepositories(githubUrl: string): Promise<GitHubRepository[]> {
+  try {
+    const url = new URL(githubUrl);
+    const username = url.hostname.toLowerCase() === "github.com" ? url.pathname.split("/").filter(Boolean)[0] : undefined;
+    if (!username || username === "your-username") return [];
+    const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/repos?type=owner&sort=updated&per_page=6`, {
+      headers: { accept: "application/vnd.github+json", "user-agent": "personal-resume-portfolio" },
+      next: { revalidate: 900 },
+    });
+    if (!response.ok) return [];
+    const data: unknown = await response.json();
+    if (!Array.isArray(data)) return [];
+    return data.filter(isRecord).filter((repo) => repo.archived !== true && repo.fork !== true && typeof repo.name === "string" && typeof repo.html_url === "string").map((repo) => ({
+      name: repo.name as string,
+      description: typeof repo.description === "string" ? repo.description : "Public repository on GitHub.",
+      htmlUrl: repo.html_url as string,
+      language: typeof repo.language === "string" ? repo.language : "GitHub",
+      stars: typeof repo.stargazers_count === "number" ? repo.stargazers_count : 0,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export async function getEditorUserId() {
@@ -91,4 +132,58 @@ async function getDb() {
 
 function pickSavedProfile(saved: Partial<EditableProfile>) {
   return Object.fromEntries(editableStringFields.map((field) => [field, saved[field] ?? profile[field]])) as Pick<EditableProfile, (typeof editableStringFields)[number]>;
+}
+
+function defaultProfile() {
+  return { ...profile, experience, skillGroups, education };
+}
+
+function parseExperience(value: unknown): ExperienceItem[] {
+  if (!Array.isArray(value) || value.length > 20) throw new Error("Invalid experience");
+  return value.map((item) => {
+    if (!isRecord(item)) throw new Error("Invalid experience item");
+    const bullets = item.bullets;
+    if (!Array.isArray(bullets) || bullets.length > 20 || bullets.some((bullet) => typeof bullet !== "string" || bullet.length > 2000)) throw new Error("Invalid experience bullets");
+    return {
+      company: readString(item.company, "experience.company"),
+      role: readString(item.role, "experience.role"),
+      location: readString(item.location, "experience.location"),
+      type: readString(item.type, "experience.type"),
+      startDate: readString(item.startDate, "experience.startDate"),
+      endDate: readString(item.endDate, "experience.endDate"),
+      bullets: bullets.map((bullet) => bullet.trim()).filter(Boolean),
+      impact: item.impact === undefined ? undefined : readString(item.impact, "experience.impact"),
+    };
+  });
+}
+
+function parseSkillGroups(value: unknown): SkillGroup[] {
+  if (!Array.isArray(value) || value.length > 30) throw new Error("Invalid skill groups");
+  return value.map((item) => {
+    if (!isRecord(item) || !Array.isArray(item.items) || item.items.length > 40 || item.items.some((skill) => typeof skill !== "string" || skill.length > 120)) throw new Error("Invalid skill group");
+    return { label: readString(item.label, "skillGroups.label"), items: item.items.map((skill) => skill.trim()).filter(Boolean) };
+  });
+}
+
+function parseEducation(value: unknown): EducationItem[] {
+  if (!Array.isArray(value) || value.length > 20) throw new Error("Invalid education");
+  return value.map((item) => {
+    if (!isRecord(item)) throw new Error("Invalid education item");
+    return {
+      qualification: readString(item.qualification, "education.qualification"),
+      school: readString(item.school, "education.school"),
+      field: readString(item.field, "education.field"),
+      year: readString(item.year, "education.year"),
+      coursework: readString(item.coursework, "education.coursework"),
+    };
+  });
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object";
+}
+
+function readString(value: unknown, field: string) {
+  if (typeof value !== "string" || value.length > 5000) throw new Error(`Invalid ${field}`);
+  return value.trim();
 }
