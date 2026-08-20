@@ -25,5 +25,5 @@ export default async function ResumePage() {
 }
 
 function hasResumeContent(value: string | undefined): value is string {
-  return Boolean(value?.trim() && !/^\[.*\]$/.test(value.trim()) && !value.includes("[Add "));
+  return Boolean(value?.trim() && !/^\[.*\]$/.test(value.trim()) && !value.includes("[Add ") && !value.includes("Replace this"));
 }
