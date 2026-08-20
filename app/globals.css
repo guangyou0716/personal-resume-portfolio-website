@@ -230,7 +230,7 @@ code { border-radius: 6px; background: rgba(7, 45, 135, .45); padding: 3px 6px; 
 
 /* Neutral glass theme: the interface stays monochrome while translucency carries depth. */
 .brand-icon { border-color: rgba(255,255,255,.18); background: #1b1b1d; box-shadow: 0 5px 12px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.16); backdrop-filter: none; -webkit-backdrop-filter: none; }
-.desktop-nav { border-color: rgba(255,255,255,.86); background: rgba(255,255,255,.56); box-shadow: 0 10px 30px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.95), inset 0 0 18px rgba(255,255,255,.28); }
+.desktop-nav { border-color: rgba(255,255,255,.92); background: rgba(255,255,255,.94); box-shadow: 0 10px 30px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.95), inset 0 0 18px rgba(255,255,255,.28); }
 .desktop-nav a { color: var(--foreground); }
 .desktop-nav a:hover { background: rgba(17,17,19,.07); }
 .desktop-nav a.is-active { background: rgba(17,17,19,.92); color: #fff; box-shadow: 0 4px 13px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.28); }
@@ -307,7 +307,8 @@ code { border-radius: 6px; background: rgba(7, 45, 135, .45); padding: 3px 6px; 
 [data-theme="dark"] body::after { background: linear-gradient(115deg, transparent 0 38%, rgba(255,255,255,.06) 38.3% 38.7%, transparent 39% 67%, rgba(255,255,255,.04) 67.3% 67.7%, transparent 68%); }
 [data-theme="dark"] .site-header, [data-theme="dark"] .hero, [data-theme="dark"] .section, [data-theme="dark"] .contact-section, [data-theme="dark"] .customize-form section, [data-theme="dark"] .customize-message, [data-theme="dark"] .detail-hero, [data-theme="dark"] .detail-content { border-color: rgba(255,255,255,.2); background: linear-gradient(135deg, rgba(255,255,255,.1), rgba(255,255,255,.04) 52%, rgba(255,255,255,.08)); }
 [data-theme="dark"] .site-header { background: transparent; }
-[data-theme="dark"] .desktop-nav, [data-theme="dark"] .theme-control, [data-theme="dark"] .mobile-menu-button { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.09); }
+[data-theme="dark"] .desktop-nav { border-color: rgba(255,255,255,.26); background: rgba(20,20,22,.94); box-shadow: 0 10px 30px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.16); }
+[data-theme="dark"] .theme-control, [data-theme="dark"] .mobile-menu-button { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.09); }
 [data-theme="dark"] .desktop-nav a { color: var(--foreground); }
 [data-theme="dark"] .desktop-nav a:hover { background: rgba(255,255,255,.08); }
 [data-theme="dark"] .desktop-nav a.is-active { background: rgba(255,255,255,.9); color: #111113; }
