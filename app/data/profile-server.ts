@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { requireChatGPTUser } from "../chatgpt-auth";
 import { portfolioProfile } from "../../db/schema";
 import { education, experience, profile, skillGroups, type EditableProfile, type EducationItem, type ExperienceItem, type SkillGroup, type SocialLinks } from "./profile";
@@ -10,7 +11,7 @@ const editableStringFields = [
   "focus", "email", "bio", "summary",
 ] as const;
 
-export async function getProfile(): Promise<typeof profile & Pick<EditableProfile, "experience" | "skillGroups" | "education" | "githubCovers">> {
+export const getProfile = cache(async (): Promise<typeof profile & Pick<EditableProfile, "experience" | "skillGroups" | "education" | "githubCovers">> => {
   try {
     const [row] = await (await getDb()).select().from(portfolioProfile).where(eq(portfolioProfile.id, PROFILE_ROW_ID)).limit(1);
     if (!row) return defaultProfile();
@@ -28,7 +29,7 @@ export async function getProfile(): Promise<typeof profile & Pick<EditableProfil
   } catch {
     return defaultProfile();
   }
-}
+});
 
 export function parseEditableProfile(input: unknown): EditableProfile {
   if (!input || typeof input !== "object") throw new Error("Invalid profile payload");
@@ -79,20 +80,20 @@ export async function requireProfileEditor() {
 }
 
 export async function isProfileEditor(user: { userId: string; email: string }) {
-  const editorUserId = await getEditorUserId();
-  const editorEmail = await getEditorEmail();
+  const [editorUserId, editorEmail] = await Promise.all([getEditorUserId(), getEditorEmail()]);
   return Boolean((editorUserId && user.userId === editorUserId) || (editorEmail && user.email.toLowerCase() === editorEmail.toLowerCase()));
 }
 
 export type GitHubRepository = { name: string; description: string; htmlUrl: string; language: string; stars: number };
 
-export async function getGitHubRepositories(githubUrl: string): Promise<GitHubRepository[]> {
+export const getGitHubRepositories = cache(async (githubUrl: string): Promise<GitHubRepository[]> => {
   try {
     const url = new URL(githubUrl);
     const username = url.hostname.toLowerCase() === "github.com" ? url.pathname.split("/").filter(Boolean)[0] : undefined;
     if (!username || username === "your-username") return [];
     const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/repos?type=owner&sort=updated&per_page=6`, {
       headers: { accept: "application/vnd.github+json", "user-agent": "personal-resume-portfolio" },
+      signal: AbortSignal.timeout(4000),
       next: { revalidate: 900 },
     });
     if (!response.ok) return [];
@@ -108,7 +109,7 @@ export async function getGitHubRepositories(githubUrl: string): Promise<GitHubRe
   } catch {
     return [];
   }
-}
+});
 
 export async function getEditorUserId() {
   try {

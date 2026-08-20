@@ -27,7 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem("portfolio-theme");var s=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t==="dark"||t==="light"?t:s;document.documentElement.style.colorScheme=document.documentElement.dataset.theme}catch(e){}` }} /></head>
       <body><SiteInteractions />{children}</body>
     </html>
   );

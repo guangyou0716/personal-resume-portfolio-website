@@ -11,7 +11,9 @@ export default async function CustomizePage() {
   if (!(await isProfileEditor(user))) return <CustomizeAccessDenied />;
   const currentProfile = await getProfile();
   const githubRepositories = await getGitHubRepositories(currentProfile.socials.github);
-  return <><main className="customize-page"><div className="container customize-shell"><div className="customize-heading"><div><span className="section-index">PRIVATE EDITOR</span><h1>Customize your portfolio</h1><p>Update the details below and they will appear on the public site and Quick Resume.</p></div><Link className="text-link" href="/" prefetch={false}>View public site ↗</Link></div><p className="customize-account">Signed in as {user.email}</p><CustomizeForm initialProfile={currentProfile} githubRepositories={githubRepositories} /></div></main></>;
+  // A native navigation preserves the editor's unsaved-change warning.
+  // eslint-disable-next-line @next/next/no-html-link-for-pages
+  return <><main className="customize-page"><div className="container customize-shell"><div className="customize-heading"><div><span className="section-index">PRIVATE EDITOR</span><h1>Customize your portfolio</h1><p>Update the details below and they will appear on the public site and Quick Resume.</p></div><a className="text-link" href="/">View public site ↗</a></div><p className="customize-account">Signed in as {user.email}</p><CustomizeForm initialProfile={currentProfile} githubRepositories={githubRepositories} /></div></main></>;
 }
 
 function CustomizeGate() {
