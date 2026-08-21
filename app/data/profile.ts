@@ -30,34 +30,29 @@ export type ProjectItem = {
   github?: string;
   demo?: string;
   featured: boolean;
-  overview: string;
-  problem: string;
-  approach: string;
-  built: string[];
-  architecture: string[];
-  challenges: string;
-  solution: string;
-  result: string;
+  overview?: string;
+  built?: string[];
+  architecture?: string[];
 };
 
 export const profile = {
-  name: "[Your Name]",
-  initials: "YN",
-  avatar: "",
-  title: "Software Developer",
+  name: "Lee Guang You",
+  initials: "GY",
+  avatar: "/profile/avatar.jpg",
+  title: "Software Engineer",
   subtitle: "Building practical systems, automation and AI-powered tools.",
-  location: "[City, Country]",
+  location: "Penang, Malaysia",
   availability: "Open to opportunities",
   focus: "Software · Automation · AI",
-  email: "you@example.com",
+  email: "guangyou7953@outlook.com",
   resumeFile: "/resume",
   bio: "I enjoy turning real-world problems into reliable software — from business systems and APIs to automation, AI tools and developer workflows.",
-  summary: "Replace this short summary with 2–3 sentences about your background, the kind of work you do best, and the problems you want to solve next.",
+  summary: "",
   values: ["Practical solutions", "Maintainable code", "Automation", "Clear documentation", "Reliable systems"],
   socials: {
-    github: "https://github.com/your-username",
-    linkedin: "https://www.linkedin.com/in/your-username",
-    email: "mailto:you@example.com",
+    github: "https://github.com/guangyou0716",
+    linkedin: "https://www.linkedin.com/in/lee-guang-you-729a12aa",
+    email: "mailto:guangyou7953@outlook.com",
   } satisfies SocialLinks,
   githubCovers: {} as Record<string, string>,
 };
@@ -83,29 +78,24 @@ export type EditableProfile = {
 };
 
 export const experience: ExperienceItem[] = [
-  {
-    company: "[Company]", role: "[Job Title]", location: "[Location]", type: "[Employment Type]", startDate: "[Start Date]", endDate: "[End Date]",
-    bullets: ["[Add what you built or maintained]", "[Add a workflow, integration or system you improved]", "[Add the users, teams or process your work supported]"],
-    impact: "[Optional impact statement — do not invent a number if you do not have one]",
-  },
-  {
-    company: "[Previous Company]", role: "[Previous Role]", location: "[Location]", type: "[Employment Type]", startDate: "[Start Date]", endDate: "[End Date]",
-    bullets: ["[Add a concise contribution]", "[Add a technical or process improvement]"],
-  },
 ];
 
 export const projects: ProjectItem[] = [
   {
-    slug: "project-one", title: "[Project Name]", description: "[Add a one-line description of the problem this project solves.]", type: "[Project Type]", status: "[Status]", technologies: ["Technology", "Framework", "Database"], github: "https://github.com/your-username/project-one", demo: "https://example.com", featured: true,
-    overview: "[Explain what this project is and who it is for.]", problem: "[Describe the real-world problem or workflow that motivated it.]", approach: "[Summarise the approach you took and why.]", built: ["[Feature or capability]", "[Feature or capability]", "[Feature or capability]"], architecture: ["Frontend", "Backend / API", "Database", "Deployment"], challenges: "[Describe the hardest part of the project.]", solution: "[Describe how you solved that challenge.]", result: "[Describe the result without inventing metrics.]",
+    slug: "codex-board", title: "codex-board", description: "A private command center for coding tasks, repositories, and Codex threads.", type: "Developer tooling", status: "Public repository", technologies: ["TypeScript"], github: "https://github.com/guangyou0716/codex-board", featured: true,
+    overview: "A private command center for coding tasks, repositories, and Codex threads.", built: ["Coding tasks", "Repository context", "Codex threads"], architecture: ["TypeScript", "Developer workflow", "Codex"],
   },
   {
-    slug: "project-two", title: "[Another Project]", description: "[Add a short description that makes the project easy to scan.]", type: "[Project Type]", status: "[Status]", technologies: ["Language", "API", "Automation"], github: "https://github.com/your-username/project-two", featured: true,
-    overview: "[Explain the project in one short paragraph.]", problem: "[What was difficult, slow or repetitive before this existed?]", approach: "[What did you decide to build?]", built: ["[Feature or capability]", "[Feature or capability]"], architecture: ["Application", "Integration", "Automation"], challenges: "[Challenge placeholder]", solution: "[Solution placeholder]", result: "[Result placeholder]",
+    slug: "personal-resume-portfolio-website", title: "personal-resume-portfolio-website", description: "Personal resume and portfolio website.", type: "Web portfolio", status: "Live site", technologies: ["TypeScript", "React", "Cloudflare"], github: "https://github.com/guangyou0716/personal-resume-portfolio-website", demo: "https://personal-resume-portfolio.guangyou1386.chatgpt.site/", featured: true,
+    overview: "Personal resume and portfolio website.", built: ["Portfolio homepage", "Quick resume", "Editable profile content"], architecture: ["React", "Vite / vinext", "Cloudflare"],
   },
   {
-    slug: "project-three", title: "[Third Project]", description: "[Add a one-line description of this project.]", type: "[Project Type]", status: "[Status]", technologies: ["Python", "OpenCV", "AI API"], featured: true,
-    overview: "[Overview placeholder]", problem: "[Problem placeholder]", approach: "[Approach placeholder]", built: ["[Feature or capability]", "[Feature or capability]"], architecture: ["Client", "AI / Computer Vision", "Deployment"], challenges: "[Challenge placeholder]", solution: "[Solution placeholder]", result: "[Result placeholder]",
+    slug: "codex-workflow-toolkit", title: "codex-workflow-toolkit", description: "A public Codex plugin for repository workflows, handoffs, and upstream skill setup.", type: "Codex plugin", status: "Public repository", technologies: ["GitHub", "Codex"], github: "https://github.com/guangyou0716/codex-workflow-toolkit", featured: true,
+    overview: "A public Codex plugin for repository workflows, handoffs, and upstream skill setup.", built: ["Repository workflow skills", "Handoff support", "Upstream skill setup"], architecture: ["Codex plugin", "Markdown skills", "GitHub"],
+  },
+  {
+    slug: "twofold", title: "TwoFold", description: "A real-time couple companion app for reminders, shared budgeting, memories, and connection.", type: "Mobile app", status: "Public repository", technologies: ["React Native", "Expo", "Firebase", "TypeScript"], github: "https://github.com/guangyou0716/TwoFold", featured: false,
+    overview: "A real-time couple companion app for reminders, shared budgeting, memories, and connection.", built: ["Shared reminders and chores", "Shared budget and savings goals", "Memory capsule and milestones", "Live partner nudges"], architecture: ["React Native / Expo", "Firebase", "TypeScript"],
   },
 ];
 
@@ -127,11 +117,11 @@ export const workStyle = [
   ["Use AI as an engineering tool", "I use AI to move faster while keeping implementation decisions reviewable."],
 ] as const;
 
-export const education: EducationItem[] = [{ qualification: "[Degree / Qualification]", school: "[University / College]", field: "[Field of Study]", year: "[Year]", coursework: "[Optional relevant coursework]" }];
+export const education: EducationItem[] = [];
 export const certifications: Array<{ name: string; issuer: string; date: string; link?: string }> = [];
 export const githubWork = [
-  { name: "[Repository Name]", description: "[What this repository demonstrates]", stack: "[Language / Stack]", stars: "—" },
-  { name: "[Repository Name]", description: "[What this repository demonstrates]", stack: "[Language / Stack]", stars: "—" },
-  { name: "[Repository Name]", description: "[What this repository demonstrates]", stack: "[Language / Stack]", stars: "—" },
+  { name: "codex-board", description: "A private command center for coding tasks, repositories, and Codex threads.", stack: "TypeScript", stars: "" },
+  { name: "personal-resume-portfolio-website", description: "Personal resume and portfolio website.", stack: "TypeScript", stars: "" },
+  { name: "codex-workflow-toolkit", description: "A public Codex plugin for repository workflows, handoffs, and upstream skill setup.", stack: "GitHub", stars: "" },
 ];
-export const isPlaceholderContent = true;
+export const isPlaceholderContent = false;

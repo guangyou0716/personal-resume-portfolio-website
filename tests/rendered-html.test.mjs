@@ -17,21 +17,25 @@ test("server-renders the portfolio homepage", async () => {
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   const html = await response.text();
-  assert.match(html, /<title>\[Your Name\] — Software Developer<\/title>/i);
+  assert.match(html, /<title>Lee Guang You — Software Engineer<\/title>/i);
   assert.match(html, /Featured Projects/);
+  assert.match(html, /codex-board/);
   assert.match(html, /Building practical systems, automation and AI-powered tools/);
   assert.match(html, /View My Work/);
   assert.match(html, /Let&apos;s Connect|Let's Connect/);
+  assert.doesNotMatch(html, /\[Your Name\]|\[Job Title\]|Replace with screenshot|Demo content/i);
   assert.doesNotMatch(html, /Your site is taking shape|react-loading-skeleton|codex-preview/i);
 });
 
 test("server-renders the core shareable routes", async () => {
-  const routes = ["/projects", "/projects/project-one", "/resume", "/guide"];
+  const routes = ["/projects", "/projects/codex-board", "/resume", "/guide"];
   const responses = await Promise.all(routes.map((route) => render(route)));
   for (const response of responses) assert.equal(response.status, 200);
   const html = await Promise.all(responses.map((response) => response.text()));
   assert.match(html[0], /Projects that show how I think and build/);
-  assert.match(html[1], /The Problem/);
+  assert.match(html[1], /codex-board/);
+  assert.match(html[1], /Highlights/);
+  assert.doesNotMatch(html[1], /your-username|example\.com|Replace with screenshot|Add screenshots/i);
   assert.match(html[2], /Print \/ Save PDF/);
   assert.match(html[3], /Keep the site easy to update/);
 });

@@ -21,9 +21,9 @@ export const getProfile = cache(async (): Promise<typeof profile & Pick<Editable
       ...pickSavedProfile(saved),
       values: saved.values ?? profile.values,
       socials: { ...profile.socials, ...saved.socials },
-      experience: Array.isArray(saved.experience) ? saved.experience : experience,
+      experience: cleanExperience(saved.experience),
       skillGroups: Array.isArray(saved.skillGroups) ? saved.skillGroups : skillGroups,
-      education: Array.isArray(saved.education) ? saved.education : education,
+      education: cleanEducation(saved.education),
       githubCovers: parseGitHubCovers(saved.githubCovers ?? {}),
     };
   } catch {
@@ -134,7 +134,10 @@ async function getDb() {
 }
 
 function pickSavedProfile(saved: Partial<EditableProfile>) {
-  return Object.fromEntries(editableStringFields.map((field) => [field, saved[field] ?? profile[field]])) as Pick<EditableProfile, (typeof editableStringFields)[number]>;
+  return Object.fromEntries(editableStringFields.map((field) => {
+    const value = saved[field];
+    return [field, typeof value === "string" && !isTemplateText(value) ? value : profile[field]];
+  })) as Pick<EditableProfile, (typeof editableStringFields)[number]>;
 }
 
 function defaultProfile() {
@@ -149,6 +152,19 @@ function parseGitHubCovers(value: unknown): Record<string, string> {
     if (trimmed && !/^(https?:\/\/|\/)/.test(trimmed)) throw new Error("Invalid GitHub cover URL");
     return [name, trimmed];
   }));
+}
+
+function cleanExperience(value: ExperienceItem[] | undefined) {
+  return Array.isArray(value) ? value.filter((item) => !isTemplateText(item.company) && !isTemplateText(item.role)) : experience;
+}
+
+function cleanEducation(value: EducationItem[] | undefined) {
+  return Array.isArray(value) ? value.filter((item) => !isTemplateText(item.qualification) && !isTemplateText(item.school)) : education;
+}
+
+function isTemplateText(value: unknown) {
+  const text = typeof value === "string" ? value.trim() : "";
+  return (text.startsWith("[") && text.endsWith("]")) || text.includes("[Add ") || text.includes("Replace this");
 }
 
 function parseExperience(value: unknown): ExperienceItem[] {
