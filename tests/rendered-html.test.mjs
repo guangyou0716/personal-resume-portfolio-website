@@ -22,6 +22,7 @@ test("server-renders the portfolio homepage", async () => {
   assert.match(html, /codex-board/);
   assert.match(html, /Building practical systems, automation and AI-powered tools/);
   assert.match(html, /View My Work/);
+  assert.match(html, /View curated projects/);
   assert.match(html, /Let&apos;s Connect|Let's Connect/);
   assert.doesNotMatch(html, /\[Your Name\]|\[Job Title\]|Replace with screenshot|Demo content/i);
   assert.doesNotMatch(html, /Your site is taking shape|react-loading-skeleton|codex-preview/i);
@@ -38,4 +39,5 @@ test("server-renders the core shareable routes", async () => {
   assert.doesNotMatch(html[1], /your-username|example\.com|Replace with screenshot|Add screenshots/i);
   assert.match(html[2], /Print \/ Save PDF/);
   assert.match(html[3], /Keep the site easy to update/);
+  assert.match(html[3], /Use the private editor to maintain profile details/);
 });

@@ -4,12 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import type { EditableProfile, EducationItem, ExperienceItem, SkillGroup } from "../data/profile";
 import type { GitHubRepository } from "../data/profile-server";
 
-export type SaveState = "idle" | "saving" | "saved" | "error";
+export type SaveState = "idle" | "saving" | "saved" | "error" | "conflict";
 
-export default function CustomizeForm({ initialProfile, githubRepositories }: { initialProfile: EditableProfile; githubRepositories: GitHubRepository[] }) {
+export default function CustomizeForm({ initialProfile, profileVersion, githubRepositories }: { initialProfile: EditableProfile; profileVersion: number | null; githubRepositories: GitHubRepository[] }) {
   const [form, setForm] = useState<EditableProfile>(() => cloneProfile(initialProfile));
   const [valuesText, setValuesText] = useState(initialProfile.values.join("\n"));
   const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [version, setVersion] = useState(profileVersion);
   const [savedSnapshot, setSavedSnapshot] = useState(() => snapshot(initialProfile, initialProfile.values.join("\n")));
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const validationRef = useRef<HTMLDivElement>(null);
@@ -40,7 +41,7 @@ export default function CustomizeForm({ initialProfile, githubRepositories }: { 
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (saveState === "saving" || !isDirty) return;
+    if (saveState === "saving" || saveState === "conflict" || !isDirty) return;
     const errors = validate(form);
     if (errors.length) {
       setValidationErrors(errors);
@@ -51,8 +52,15 @@ export default function CustomizeForm({ initialProfile, githubRepositories }: { 
     setSaveState("saving");
     const payload = { ...form, values: valuesText.split(/\r?\n/) };
     try {
-      const response = await fetch("/api/profile", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const response = await fetch("/api/profile", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ profile: payload, expectedUpdatedAt: version }) });
+      if (response.status === 409) {
+        setSaveState("conflict");
+        return;
+      }
       if (!response.ok) throw new Error("Unable to save");
+      const saved = await response.json() as { updatedAt?: unknown };
+      if (typeof saved.updatedAt !== "number" || !Number.isSafeInteger(saved.updatedAt)) throw new Error("Invalid save response");
+      setVersion(saved.updatedAt);
       setSavedSnapshot(JSON.stringify(payload));
       setSaveState("saved");
     } catch {
@@ -60,7 +68,7 @@ export default function CustomizeForm({ initialProfile, githubRepositories }: { 
     }
   }
 
-  const status = saveState === "saving" ? "Saving…" : saveState === "error" ? "Could not save. Please try again." : isDirty ? "Unsaved changes" : saveState === "saved" ? "All changes saved" : "";
+  const status = saveState === "saving" ? "Saving…" : saveState === "conflict" ? "This profile changed elsewhere. Reload the editor before saving." : saveState === "error" ? "Could not save. Please try again." : isDirty ? "Unsaved changes" : saveState === "saved" ? "All changes saved" : "";
   return <form id="customize-form" className="customize-form" onSubmit={save}>
     <nav className="customize-section-nav" aria-label="Editor sections">{[["profile", "Profile"], ["introduction", "Introduction"], ["experience", "Experience"], ["skills", "Skills & Technologies"], ["education", "Education"], ["github", "GitHub covers"], ["contact", "Contact links"]].map(([id, label]) => <a href={`#customize-${id}`} key={id}>{label}</a>)}</nav>
     <div className="customize-fields">
@@ -74,7 +82,7 @@ export default function CustomizeForm({ initialProfile, githubRepositories }: { 
         <section id="customize-github"><h2>GitHub covers</h2>{githubRepositories.length ? <div className="customize-list">{githubRepositories.map((repo) => <div className="customize-item" key={repo.name}><label>{repo.name} cover image URL<input type="url" value={form.githubCovers[repo.name] ?? ""} onChange={(event) => updateGitHubCover(repo.name, event.target.value)} placeholder="https://... or /profile/project-cover.jpg" /></label></div>)}</div> : <p className="customize-help">Add a public GitHub profile URL above, save it, then reload this page to edit repository covers.</p>}<p className="customize-help">Paste a public image URL, including a GitHub Social preview URL, or a site path such as /profile/project-cover.jpg. Leave blank to keep the placeholder.</p></section>
         <section id="customize-contact"><h2>Contact links</h2><div className="customize-grid"><label>Email<input type="email" value={form.email} onChange={(event) => update("email", event.target.value)} /></label><label>GitHub URL<input type="url" value={form.socials.github} onChange={(event) => updateSocial("github", event.target.value)} /></label><label>LinkedIn URL<input type="url" value={form.socials.linkedin} onChange={(event) => updateSocial("linkedin", event.target.value)} /></label><label>Email link<input type="text" value={form.socials.email} onChange={(event) => updateSocial("email", event.target.value)} /></label></div><p className="customize-help">When the GitHub URL points to a public profile, Featured Projects and Selected GitHub Work update automatically from its public repositories.</p></section>
       </fieldset>
-      <div className="customize-actions"><button className="button button--primary" type="submit" disabled={saveState === "saving" || !isDirty} aria-busy={saveState === "saving"}>Save changes</button><a className="text-link" href="/signout-with-chatgpt?return_to=/">Sign out</a><span aria-live="polite" role="status">{status}</span></div>
+      <div className="customize-actions"><button className="button button--primary" type="submit" disabled={saveState === "saving" || saveState === "conflict" || !isDirty} aria-busy={saveState === "saving"}>Save changes</button>{saveState === "conflict" && <a className="text-link" href="/customize">Reload editor</a>}<a className="text-link" href="/signout-with-chatgpt?return_to=/">Sign out</a><span aria-live="polite" role="status">{status}</span></div>
     </div>
   </form>;
 }

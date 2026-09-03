@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { requireChatGPTUser } from "../chatgpt-auth";
@@ -11,25 +11,19 @@ const editableStringFields = [
   "focus", "email", "bio", "summary",
 ] as const;
 
-export const getProfile = cache(async (): Promise<typeof profile & Pick<EditableProfile, "experience" | "skillGroups" | "education" | "githubCovers">> => {
+type CurrentProfile = typeof profile & Pick<EditableProfile, "experience" | "skillGroups" | "education" | "githubCovers">;
+
+export const getProfile = cache(async (): Promise<CurrentProfile> => {
   try {
-    const [row] = await (await getDb()).select().from(portfolioProfile).where(eq(portfolioProfile.id, PROFILE_ROW_ID)).limit(1);
-    if (!row) return defaultProfile();
-    const saved = JSON.parse(row.content) as Partial<EditableProfile>;
-    return {
-      ...profile,
-      ...pickSavedProfile(saved),
-      values: saved.values ?? profile.values,
-      socials: { ...profile.socials, ...saved.socials },
-      experience: cleanExperience(saved.experience),
-      skillGroups: Array.isArray(saved.skillGroups) ? saved.skillGroups : skillGroups,
-      education: cleanEducation(saved.education),
-      githubCovers: parseGitHubCovers(saved.githubCovers ?? {}),
-    };
+    return (await readProfile()).profile;
   } catch {
     return defaultProfile();
   }
 });
+
+export async function getProfileForEditor() {
+  return readProfile();
+}
 
 export function parseEditableProfile(input: unknown): EditableProfile {
   if (!input || typeof input !== "object") throw new Error("Invalid profile payload");
@@ -64,13 +58,14 @@ export function parseEditableProfile(input: unknown): EditableProfile {
   };
 }
 
-export async function saveProfile(input: unknown) {
+export async function saveProfile(input: unknown, expectedUpdatedAt: number | null): Promise<number | null> {
   const saved = parseEditableProfile(input);
   const db = await getDb();
-  await db.insert(portfolioProfile).values({ id: PROFILE_ROW_ID, content: JSON.stringify(saved), updatedAt: Date.now() }).onConflictDoUpdate({
-    target: portfolioProfile.id,
-    set: { content: JSON.stringify(saved), updatedAt: Date.now() },
-  });
+  const updatedAt = Math.max(Date.now(), (expectedUpdatedAt ?? 0) + 1);
+  const result = expectedUpdatedAt === null
+    ? await db.insert(portfolioProfile).values({ id: PROFILE_ROW_ID, content: JSON.stringify(saved), updatedAt }).onConflictDoNothing().run()
+    : await db.update(portfolioProfile).set({ content: JSON.stringify(saved), updatedAt }).where(and(eq(portfolioProfile.id, PROFILE_ROW_ID), eq(portfolioProfile.updatedAt, expectedUpdatedAt))).run();
+  return result.meta.changes === 1 ? updatedAt : null;
 }
 
 export async function requireProfileEditor() {
@@ -131,6 +126,25 @@ export async function getEditorEmail() {
 
 async function getDb() {
   return (await import("../../db")).getDb();
+}
+
+async function readProfile(): Promise<{ profile: CurrentProfile; updatedAt: number | null }> {
+  const [row] = await (await getDb()).select().from(portfolioProfile).where(eq(portfolioProfile.id, PROFILE_ROW_ID)).limit(1);
+  if (!row) return { profile: defaultProfile(), updatedAt: null };
+  const saved = JSON.parse(row.content) as Partial<EditableProfile>;
+  return {
+    updatedAt: row.updatedAt,
+    profile: {
+      ...profile,
+      ...pickSavedProfile(saved),
+      values: saved.values ?? profile.values,
+      socials: { ...profile.socials, ...saved.socials },
+      experience: cleanExperience(saved.experience),
+      skillGroups: Array.isArray(saved.skillGroups) ? saved.skillGroups : skillGroups,
+      education: cleanEducation(saved.education),
+      githubCovers: parseGitHubCovers(saved.githubCovers ?? {}),
+    },
+  };
 }
 
 function pickSavedProfile(saved: Partial<EditableProfile>) {
