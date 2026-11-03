@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { requireProfileEditor } from "../data/profile-server";
+export const dynamic = "force-dynamic";
 import { SiteFooter, SiteHeader } from "../components";
 
-export const metadata: Metadata = { title: "Customize guide", description: "Private maintenance guide for updating this personal resume site." };
+export const metadata: Metadata = { title: "Customize guide", robots: { index: false, follow: false }, description: "Private maintenance guide for updating this personal resume site." };
 
 const guideItems = [
   ["Open the editor", "Visit /customize and sign in with the site owner account. Changes are saved for the public site."],
@@ -17,6 +19,7 @@ const guideItems = [
   ["Change theme accent", "Update --accent and --accent-soft at the top of app/globals.css."],
 ];
 
-export default function GuidePage() {
-  return <><SiteHeader /><main className="guide-page"><div className="container guide-intro"><span className="section-index">PRIVATE MAINTENANCE GUIDE</span><h1>Keep the site easy to update.</h1><p>This page is intentionally not in the public navigation. Use the private editor to maintain profile details; static project case studies and site styling remain in the source code.</p><Link className="text-link" href="/" prefetch={false}>← Back to portfolio</Link></div><section className="container guide-list">{guideItems.map(([title, text], index) => <article key={title}><span className="guide-number">0{index + 1}</span><div><h2>{title}</h2><p>{text}</p></div></article>)}</section></main><SiteFooter /></>;
+export default async function GuidePage() {
+  await requireProfileEditor();
+  return <><SiteHeader /><main id="main-content" className="guide-page"><div className="container guide-intro"><span className="section-index">PRIVATE MAINTENANCE GUIDE</span><h1>Keep the site easy to update.</h1><p>This page is intentionally not in the public navigation. Use the private editor to maintain profile details; static project case studies and site styling remain in the source code.</p><Link className="text-link" href="/" prefetch={false}>← Back to portfolio</Link></div><section className="container guide-list">{guideItems.map(([title, text], index) => <article key={title}><span className="guide-number">0{index + 1}</span><div><h2>{title}</h2><p>{text}</p></div></article>)}</section></main><SiteFooter /></>;
 }

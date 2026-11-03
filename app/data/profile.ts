@@ -35,6 +35,12 @@ export type ProjectItem = {
   architecture?: string[];
 };
 
+export function displayProjectName(name: string) {
+  return name.includes("-") || name.includes("_")
+    ? name.replace(/[-_]+/g, " ").replace(/\b[a-z]/g, (letter) => letter.toUpperCase())
+    : name;
+}
+
 export const profile = {
   name: "Lee Guang You",
   initials: "GY",
@@ -119,9 +125,11 @@ export const workStyle = [
 
 export const education: EducationItem[] = [];
 export const certifications: Array<{ name: string; issuer: string; date: string; link?: string }> = [];
-export const githubWork = [
-  { name: "codex-board", description: "A private command center for coding tasks, repositories, and Codex threads.", stack: "TypeScript", stars: "" },
-  { name: "personal-resume-portfolio-website", description: "Personal resume and portfolio website.", stack: "TypeScript", stars: "" },
-  { name: "codex-workflow-toolkit", description: "A public Codex plugin for repository workflows, handoffs, and upstream skill setup.", stack: "GitHub", stars: "" },
-];
+export const githubWork = projects.filter((project) => project.featured && project.github).map((project) => ({
+  name: project.title,
+  description: project.description,
+  github: project.github!,
+  stack: project.technologies[0],
+  stars: "",
+}));
 export const isPlaceholderContent = false;

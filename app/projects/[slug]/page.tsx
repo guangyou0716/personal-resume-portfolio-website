@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Icon, ProjectPreview, SiteFooter, SiteHeader } from "../../components";
-import { projects } from "../../data/profile";
+import { displayProjectName, projects } from "../../data/profile";
 import { getProfile } from "../../data/profile-server";
 
 export function generateStaticParams() {
@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const profile = await getProfile();
   if (!project) return { title: "Project not found" };
   return {
-    title: `${project.title} — ${profile.name}`,
+    title: `${displayProjectName(project.title)} — ${profile.name}`,
     description: project.description,
-    openGraph: { title: `${project.title} — ${profile.name}`, description: project.description, type: "article", images: [] },
-    twitter: { card: "summary", title: `${project.title} — ${profile.name}`, description: project.description, images: [] },
+    openGraph: { title: `${displayProjectName(project.title)} — ${profile.name}`, description: project.description, type: "article", images: [] },
+    twitter: { card: "summary", title: `${displayProjectName(project.title)} — ${profile.name}`, description: project.description, images: [] },
   };
 }
 
@@ -33,7 +33,10 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const project = getProject(slug);
   if (!project) notFound();
 
-  return <><SiteHeader active="Projects" /><main className="detail-page"><div className="container detail-breadcrumb"><Link href="/projects" prefetch={false}>Projects</Link><span>/</span><span>{project.title}</span></div><section className="container detail-hero"><div><span className="section-index">{project.type} · {project.status}</span><h1>{project.title}</h1><p>{project.description}</p><div className="detail-actions">{project.github && <a className="button button--secondary" href={project.github} target="_blank" rel="noreferrer">GitHub <span>↗</span></a>}{project.demo && <a className="button button--primary" href={project.demo} target="_blank" rel="noreferrer">Live Demo <Icon name="arrow" size={16} /></a>}</div></div><div className="detail-hero-visual">{project.coverImage ? <img src={project.coverImage} width="1200" height="780" decoding="async" fetchPriority="high" alt={`${project.title} screenshot`} /> : <ProjectPreview project={project} />}</div></section><section className="container detail-content"><div className="detail-main">{project.overview && <DetailSection title="Overview"><p>{project.overview}</p></DetailSection>}{project.built?.length ? <DetailSection title="Highlights"><ul>{project.built.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul></DetailSection> : null}</div><aside className="detail-aside">{project.architecture?.length ? <div><h2>Architecture</h2><ul>{project.architecture.map((item) => <li key={item}>{item}</li>)}</ul></div> : null}<div><h2>Technologies</h2><div className="tag-row">{project.technologies.map((tech) => <span key={tech}>{tech}</span>)}</div></div></aside></section>{project.screenshots?.length ? <section className="container detail-gallery"><h2>Gallery</h2><div className="gallery-grid">{project.screenshots.map((image) => <img key={image} src={image} width="800" height="530" alt={`${project.title} project screenshot`} loading="lazy" decoding="async" />)}</div></section> : null}<section className="container detail-footer-links"><Link className="text-link" href="/projects" prefetch={false}>← Back to Projects</Link><Link className="text-link" href="/" prefetch={false}>Back home <Icon name="arrow" size={16} /></Link></section></main><SiteFooter /></>;
+  const profile = await getProfile();
+  const coverImage = profile.githubCovers[project.title] || project.coverImage;
+
+  return <><SiteHeader active="Projects" /><main id="main-content" className="detail-page"><div className="container detail-breadcrumb"><Link href="/projects" prefetch={false}>Projects</Link><span>/</span><span>{displayProjectName(project.title)}</span></div><section className={`container detail-hero ${coverImage ? "" : "detail-hero--text"}`}><div><span className="section-index">{project.type} · {project.status}</span><h1>{displayProjectName(project.title)}</h1><p>{project.description}</p><div className="detail-actions">{project.github && <a className="button button--secondary" href={project.github} target="_blank" rel="noreferrer">View source <span aria-hidden="true">↗</span></a>}{project.demo && <a className="button button--primary" href={project.demo} target="_blank" rel="noreferrer">Live Demo <Icon name="arrow" size={16} /></a>}</div></div><div className="detail-hero-visual">{coverImage ? <img src={coverImage} width="1200" height="780" decoding="async" fetchPriority="high" alt={`${displayProjectName(project.title)} screenshot`} /> : <ProjectPreview project={project} />}</div></section><section className="container detail-content"><div className="detail-main">{project.overview && <DetailSection title="Overview"><p>{project.overview}</p></DetailSection>}{project.built?.length ? <DetailSection title="Highlights"><ul>{project.built.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul></DetailSection> : null}</div><aside className="detail-aside">{project.architecture?.length ? <div><h2>Stack & focus</h2><ul>{project.architecture.map((item) => <li key={item}>{item}</li>)}</ul></div> : null}<div><h2>Technologies</h2><div className="tag-row">{project.technologies.map((tech) => <span key={tech}>{tech}</span>)}</div></div></aside></section>{project.screenshots?.length ? <section className="container detail-gallery"><h2>Gallery</h2><div className="gallery-grid">{project.screenshots.map((image) => <img key={image} src={image} width="800" height="530" alt={`${displayProjectName(project.title)} project screenshot`} loading="lazy" decoding="async" />)}</div></section> : null}<section className="container detail-footer-links"><Link className="text-link" href="/projects" prefetch={false}>← Back to Projects</Link><Link className="text-link" href="/" prefetch={false}>Back home <Icon name="arrow" size={16} /></Link></section></main><SiteFooter /></>;
 }
 
 function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {

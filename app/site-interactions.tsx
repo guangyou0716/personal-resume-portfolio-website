@@ -18,7 +18,10 @@ export default function SiteInteractions() {
     const applyTheme = (theme: "dark" | "light") => {
       root.dataset.theme = theme;
       root.style.colorScheme = theme;
-      themeButtons.forEach((button) => button.setAttribute("aria-pressed", String(theme === "dark")));
+      themeButtons.forEach((button) => {
+        button.setAttribute("aria-pressed", String(theme === "dark"));
+        button.title = theme === "dark" ? "Switch to light appearance" : "Switch to dark appearance";
+      });
     };
     const readStoredTheme = () => {
       try { return window.localStorage.getItem("portfolio-theme"); } catch { return null; }
@@ -38,7 +41,11 @@ export default function SiteInteractions() {
     const systemMedia = window.matchMedia("(prefers-color-scheme: dark)");
     systemMedia.addEventListener?.("change", onSystemThemeChange);
 
+    const setBackgroundInert = (value: boolean) => {
+      document.querySelectorAll<HTMLElement>("main, .site-footer").forEach((element) => { element.inert = value; });
+    };
     const closeMenu = (restoreFocus = false) => {
+      setBackgroundInert(false);
       mobileNav?.classList.remove("is-open");
       document.body.classList.remove("menu-open");
       menuButton?.setAttribute("aria-expanded", "false");
@@ -50,15 +57,36 @@ export default function SiteInteractions() {
       if (window.innerWidth > MOBILE_BREAKPOINT || !mobileNav) return;
       lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : menuButton;
       mobileNav.classList.add("is-open");
+      setBackgroundInert(true);
+      requestAnimationFrame(() => {
+        if (mobileNav.classList.contains("is-open")) mobileNav.querySelector<HTMLAnchorElement>("a")?.focus();
+      });
       document.body.classList.add("menu-open");
       menuButton?.setAttribute("aria-expanded", "true");
       menuButton?.setAttribute("aria-label", "Close menu");
     };
-    const toggleMenu = () => mobileNav?.classList.contains("is-open") ? closeMenu() : openMenu();
-    const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape" && mobileNav?.classList.contains("is-open")) { event.preventDefault(); closeMenu(true); } };
-    const onPointerDown = (event: PointerEvent) => { if (mobileNav?.classList.contains("is-open") && header && event.target instanceof Node && !header.contains(event.target)) closeMenu(); };
+    const toggleMenu = () => mobileNav?.classList.contains("is-open") ? closeMenu(true) : openMenu();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Tab" && mobileNav?.classList.contains("is-open")) {
+        const controls = Array.from(header?.querySelectorAll<HTMLButtonElement | HTMLAnchorElement>(".brand-link, .header-actions button, [data-mobile-nav] a, [data-mobile-nav] button") ?? []);
+        const first = controls[0], last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }
+      if (event.key === "Escape" && mobileNav?.classList.contains("is-open")) { event.preventDefault(); closeMenu(true); } };
+    const onPointerDown = (event: PointerEvent) => { if (mobileNav?.classList.contains("is-open") && header && event.target instanceof Node && !header.contains(event.target)) closeMenu(true); };
     const onResize = () => { if (window.innerWidth > MOBILE_BREAKPOINT) closeMenu(); };
-    const onNavClick = () => closeMenu();
+    const onNavClick = (event: Event) => {
+      closeMenu();
+      if (!(event.currentTarget instanceof HTMLAnchorElement)) return;
+      const destination = new URL(event.currentTarget.href);
+      if (destination.pathname !== window.location.pathname || !destination.hash) return;
+      const target = document.getElementById(destination.hash.slice(1));
+      if (target) {
+        target.setAttribute("tabindex", "-1");
+        target.focus({ preventScroll: true });
+      }
+    };
     themeButtons.forEach((button) => button.addEventListener("click", toggleTheme));
     menuButton?.addEventListener("click", toggleMenu);
     mobileNav?.querySelectorAll("a").forEach((link) => link.addEventListener("click", onNavClick));
@@ -84,6 +112,7 @@ export default function SiteInteractions() {
     });
 
     return () => {
+      closeMenu();
       themeButtons.forEach((button) => button.removeEventListener("click", toggleTheme));
       menuButton?.removeEventListener("click", toggleMenu);
       mobileNav?.querySelectorAll("a").forEach((link) => link.removeEventListener("click", onNavClick));

@@ -76,7 +76,7 @@ export async function requireProfileEditor() {
 
 export async function isProfileEditor(user: { userId: string; email: string }) {
   const [editorUserId, editorEmail] = await Promise.all([getEditorUserId(), getEditorEmail()]);
-  return Boolean((editorUserId && user.userId === editorUserId) || (editorEmail && user.email.toLowerCase() === editorEmail.toLowerCase()));
+  return user.userId === editorUserId || Boolean(editorEmail && user.email.toLowerCase() === editorEmail.toLowerCase());
 }
 
 export type GitHubRepository = { name: string; description: string; htmlUrl: string; language: string; stars: number };

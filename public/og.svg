@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#fff"/>
+  <path d="M72 160H1128M72 552H1128" stroke="#dfe4ec" stroke-width="2"/>
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <text x="72" y="108" fill="#2456d8" font-size="48" font-weight="800">GY</text>
+    <text x="1128" y="102" text-anchor="end" fill="#536071" font-size="23">Portfolio · Resume · Selected work</text>
+    <text x="72" y="283" fill="#19202b" font-size="76" font-weight="700" letter-spacing="-2">Lee Guang You</text>
+    <text x="72" y="354" fill="#2456d8" font-size="44" font-weight="600">Software Engineer</text>
+    <text x="72" y="427" fill="#536071" font-size="29">Building practical systems, automation</text>
+    <text x="72" y="470" fill="#536071" font-size="29">and AI-powered tools.</text>
+    <text x="72" y="597" fill="#536071" font-size="23">Penang, Malaysia</text>
+    <text x="1128" y="597" text-anchor="end" fill="#2456d8" font-size="23">Explore the work →</text>
+  </g>
+</svg>
