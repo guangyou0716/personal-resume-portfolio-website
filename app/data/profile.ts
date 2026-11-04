@@ -44,7 +44,7 @@ export function displayProjectName(name: string) {
 export const profile = {
   name: "Lee Guang You",
   initials: "GY",
-  avatar: "/profile/avatar.jpg",
+  avatar: "/profile/avatar-linkedin.png",
   title: "Software Engineer",
   subtitle: "Building practical systems, automation and AI-powered tools.",
   location: "Penang, Malaysia",
@@ -88,16 +88,16 @@ export const experience: ExperienceItem[] = [
 
 export const projects: ProjectItem[] = [
   {
-    slug: "codex-board", title: "codex-board", description: "A private command center for coding tasks, repositories, and Codex threads.", type: "Developer tooling", status: "Public repository", technologies: ["TypeScript"], github: "https://github.com/guangyou0716/codex-board", featured: true,
-    overview: "A private command center for coding tasks, repositories, and Codex threads.", built: ["Coding tasks", "Repository context", "Codex threads"], architecture: ["TypeScript", "Developer workflow", "Codex"],
+    slug: "codex-board", title: "codex-board", description: "React and TypeScript dashboard with a task board, repository management, Codex thread controls and usage monitoring.", type: "Developer tooling", status: "Public repository", technologies: ["React", "TypeScript"], github: "https://github.com/guangyou0716/codex-board", featured: true,
+    overview: "React and TypeScript dashboard with a task board, repository management, Codex thread controls and usage monitoring.", built: ["Coding tasks", "Repository context", "Codex threads"], architecture: ["TypeScript", "Developer workflow", "Codex"],
   },
   {
-    slug: "personal-resume-portfolio-website", title: "personal-resume-portfolio-website", description: "Personal resume and portfolio website.", type: "Web portfolio", status: "Live site", technologies: ["TypeScript", "React", "Cloudflare"], github: "https://github.com/guangyou0716/personal-resume-portfolio-website", demo: "https://personal-resume-portfolio.guangyou1386.chatgpt.site/", featured: true,
-    overview: "Personal resume and portfolio website.", built: ["Portfolio homepage", "Quick resume", "Editable profile content"], architecture: ["React", "Vite / vinext", "Cloudflare"],
+    slug: "personal-resume-portfolio-website", title: "personal-resume-portfolio-website", description: "React portfolio and printable resume with an authenticated profile editor and persistent profile data in Cloudflare D1.", type: "Web portfolio", status: "Live site", technologies: ["TypeScript", "React", "Cloudflare"], github: "https://github.com/guangyou0716/personal-resume-portfolio-website", demo: "https://gy-portfolio.guangyou1386.chatgpt.site/", featured: true,
+    overview: "React portfolio and printable resume with an authenticated profile editor and persistent profile data in Cloudflare D1.", built: ["Portfolio homepage", "Quick resume", "Editable profile content"], architecture: ["React", "Vite / vinext", "Cloudflare"],
   },
   {
-    slug: "codex-workflow-toolkit", title: "codex-workflow-toolkit", description: "A public Codex plugin for repository workflows, handoffs, and upstream skill setup.", type: "Codex plugin", status: "Public repository", technologies: ["GitHub", "Codex"], github: "https://github.com/guangyou0716/codex-workflow-toolkit", featured: true,
-    overview: "A public Codex plugin for repository workflows, handoffs, and upstream skill setup.", built: ["Repository workflow skills", "Handoff support", "Upstream skill setup"], architecture: ["Codex plugin", "Markdown skills", "GitHub"],
+    slug: "codex-workflow-toolkit", title: "codex-workflow-toolkit", description: "Repository workflow skills for delegation, chat handoffs and maintaining repository maps, distributed as a Codex plugin.", type: "Codex plugin", status: "Public repository", technologies: ["GitHub", "Codex"], github: "https://github.com/guangyou0716/codex-workflow-toolkit", featured: true,
+    overview: "Repository workflow skills for delegation, chat handoffs and maintaining repository maps, distributed as a Codex plugin.", built: ["Repository workflow skills", "Handoff support", "Upstream skill setup"], architecture: ["Codex plugin", "Markdown skills", "GitHub"],
   },
   {
     slug: "twofold", title: "TwoFold", description: "A real-time couple companion app for reminders, shared budgeting, memories, and connection.", type: "Mobile app", status: "Public repository", technologies: ["React Native", "Expo", "Firebase", "TypeScript"], github: "https://github.com/guangyou0716/TwoFold", featured: false,

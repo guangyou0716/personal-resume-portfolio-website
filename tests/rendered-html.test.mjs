@@ -21,9 +21,9 @@ test("server-renders the portfolio homepage", async () => {
   assert.match(html, /Selected work/);
   assert.match(html, /codex-board/);
   assert.match(html, /Building practical systems, automation and AI-powered tools/);
-  assert.match(html, /View My Work/);
+  assert.match(html, /View my work/);
   assert.match(html, /View all projects/);
-  assert.match(html, /Let&apos;s Connect|Let's Connect/);
+  assert.match(html, /Let&apos;s connect|Let's connect/);
   assert.doesNotMatch(html, /\[Your Name\]|\[Job Title\]|Replace with screenshot|Demo content/i);
   assert.doesNotMatch(html, /Your site is taking shape|react-loading-skeleton|codex-preview/i);
 });
@@ -41,7 +41,7 @@ test("server-renders the core shareable routes", async () => {
 
 });
 
-test("recruiter pages keep curated project details when GitHub is unavailable", async () => {
+test("homepage keeps curated projects and resume stays focused when GitHub is unavailable", async () => {
   const originalFetch = globalThis.fetch;
   let githubRequests = 0;
   globalThis.fetch = async (input, ...args) => {
@@ -57,11 +57,14 @@ test("recruiter pages keep curated project details when GitHub is unavailable", 
       const response = await render(pathname);
       assert.equal(response.status, 200);
       const html = await response.text();
-      for (const slug of ["codex-board", "personal-resume-portfolio-website", "codex-workflow-toolkit"]) {
-        assert.match(html, new RegExp(`href="(?:https://personal-resume-portfolio\\.guangyou1386\\.chatgpt\\.site)?/projects/${slug}"`));
+      if (pathname === "/") {
+        for (const slug of ["codex-board", "personal-resume-portfolio-website", "codex-workflow-toolkit"]) {
+          assert.match(html, new RegExp(`href="(?:https://gy-portfolio\\.guangyou1386\\.chatgpt\\.site)?/projects/${slug}"`));
+        }
+      } else {
+        assert.doesNotMatch(html, /Selected projects|resume-project/);
       }
       assert.doesNotMatch(html, /Public repository on GitHub\./);
-      if (pathname === "/resume") assert.match(html, /Repository workflow skills/);
     }
     assert.equal(githubRequests, 0, "recruiter pages must not wait on GitHub's API");
     const missing = await render("/projects/does-not-exist");
