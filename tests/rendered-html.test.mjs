@@ -37,7 +37,7 @@ test("server-renders the core shareable routes", async () => {
   assert.match(html[1], /codex-board/);
   assert.match(html[1], /Highlights/);
   assert.doesNotMatch(html[1], /your-username|example\.com|Replace with screenshot|Add screenshots/i);
-  assert.match(html[2], /Print \/ Save PDF/);
+  assert.match(html[2], /Print \/ save PDF/);
 
 });
 
