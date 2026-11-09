@@ -1,17 +1,17 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-export const metadata: Metadata = { title: "Owner editor", robots: { index: false, follow: false } };
-import { chatGPTSignInPath, getChatGPTUser } from "../chatgpt-auth";
-import { getGitHubRepositories, getProfileForEditor, isProfileEditor } from "../data/profile-server";
+import Link from "next/link";
+import { ACCESS_SIGN_IN_PATH, ACCESS_SIGN_OUT_PATH, getAccessUser, isAccessConfigured } from "../auth";
 import { Icon } from "../components";
+import { getGitHubRepositories, getProfileForEditor, isProfileEditor } from "../data/profile-server";
 import CustomizeForm from "./customize-form";
 
+export const metadata: Metadata = { title: "Owner editor", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 export default async function CustomizePage() {
-  const user = await getChatGPTUser();
-  if (!user) return <CustomizeGate />;
-  if (!(await isProfileEditor(user))) return <CustomizeAccessDenied />;
+  if (!(await isAccessConfigured())) return <CustomizeBlocked configured={false} />;
+  const user = await getAccessUser();
+  if (!user || !(await isProfileEditor(user))) return <CustomizeBlocked configured />;
   let currentProfile;
   try {
     currentProfile = await getProfileForEditor();
@@ -24,12 +24,8 @@ export default async function CustomizePage() {
   return <><main id="main-content" className="customize-page"><div className="container customize-shell"><div className="customize-heading"><div><span className="section-index">PRIVATE EDITOR</span><h1>Customize your portfolio</h1><p>Update the details below and they will appear on the public site and Quick resume.</p></div><a className="text-link" href="/">View public site <Icon name="external" /></a></div><p className="customize-account">Signed in as {user.email}</p><CustomizeForm initialProfile={currentProfile.profile} profileVersion={currentProfile.updatedAt} githubRepositories={githubRepositories} /></div></main></>;
 }
 
-function CustomizeGate() {
-  return <main id="main-content" className="customize-page"><div className="container customize-shell customize-message"><span className="section-index">PRIVATE EDITOR</span><h1>Sign in to customize your portfolio</h1><p>This page is only for the site owner. Sign in with ChatGPT to continue.</p><a className="button button--primary" href={chatGPTSignInPath("/customize")} target="_top">Sign in with ChatGPT</a><Link className="text-link" href="/" prefetch={false}><Icon name="arrow-left" />Back to public site</Link></div></main>;
-}
-
-function CustomizeAccessDenied() {
-  return <main id="main-content" className="customize-page"><div className="container customize-shell customize-message"><span className="section-index">PRIVATE EDITOR</span><h1>This account cannot edit the site</h1><p>Sign out and use the ChatGPT account that owns this portfolio.</p><a className="button button--secondary" href="/signout-with-chatgpt?return_to=/customize">Sign out</a><Link className="text-link" href="/" prefetch={false}><Icon name="arrow-left" />Back to public site</Link></div></main>;
+function CustomizeBlocked({ configured }: { configured: boolean }) {
+  return <main id="main-content" className="customize-page"><div className="container customize-shell customize-message"><span className="section-index">PRIVATE EDITOR</span><h1>{configured ? "Not authorized" : "Editor not configured"}</h1><p>{configured ? "You are not authorized to edit this site. Sign in through Cloudflare Access with the owner account." : "Cloudflare Access is not configured. You are not authorized to edit this site."}</p>{configured && <a className="button button--primary" href={ACCESS_SIGN_IN_PATH}>Owner access</a>}{configured && <a className="button button--secondary" href={ACCESS_SIGN_OUT_PATH}>Sign out</a>}<Link className="text-link" href="/" prefetch={false}><Icon name="arrow-left" />Back to public site</Link></div></main>;
 }
 
 function CustomizeUnavailable() {

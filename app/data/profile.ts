@@ -46,15 +46,15 @@ export const profile = {
   initials: "GY",
   avatar: "/profile/avatar-linkedin.png",
   title: "Software Engineer",
-  subtitle: "Building practical systems, automation and AI-powered tools.",
-  location: "Penang, Malaysia",
+  subtitle: "Connecting software, hardware and business operations.",
+  location: "Simpang Ampat, Penang, Malaysia",
   availability: "Open to opportunities",
-  focus: "Software · Automation · AI",
+  focus: "System Integration · Automation · Smart Metering",
   email: "guangyou7953@outlook.com",
   resumeFile: "/resume",
-  bio: "I enjoy turning real-world problems into reliable software — from business systems and APIs to automation, AI tools and developer workflows.",
-  summary: "",
-  values: ["Practical solutions", "Maintainable code", "Automation", "Clear documentation", "Reliable systems"],
+  bio: "I build web and desktop applications, connect software with hardware, and automate business workflows — from smart metering and industrial systems to payments and e-Invoicing.",
+  summary: "I’m a technology enthusiast with a passion for software development, system integration, and automation.\n\nMy experience spans smart metering solutions, industrial production machines, and web application development. I’ve worked on integrating PayNet DuitNow payment services and LHDN MyInvois e-Invoicing systems, bridging software with real-world business operations.\n\nOne of my memorable experiences was contributing to Singapore’s National Day Parade (NDP), supporting power monitoring through smart metering technology.\n\nI enjoy solving technical challenges, exploring new technologies, and finding smarter ways to connect software, hardware, and automation.\n\nI’m always looking to learn, improve, and take on new challenges that create meaningful impact.",
+  values: [] as string[],
   socials: {
     github: "https://github.com/guangyou0716",
     linkedin: "https://www.linkedin.com/in/lee-guang-you-729a12aa",
@@ -84,6 +84,51 @@ export type EditableProfile = {
 };
 
 export const experience: ExperienceItem[] = [
+  {
+    company: "Bioenergy Projects Sdn Bhd",
+    role: "Software Engineer",
+    location: "Perai, Penang, Malaysia",
+    type: "Full-time · On-site",
+    startDate: "Mar 2024",
+    endDate: "Present",
+    bullets: [
+      "Developed and maintained PHP-based web applications to support business operations.",
+      "Contributed to PayNet DuitNow payment and LHDN MyInvois e-Invoicing API integrations.",
+      "Supported smart meter power monitoring and data collection, including operations for Singapore’s National Day Parade (NDP).",
+      "Supported industrial production machines through software and hardware integration and automation.",
+    ],
+  },
+  {
+    company: "Kaifa Technology Malaysia",
+    role: "MES Assistant Engineer",
+    location: "Bukit Mertajam, Penang, Malaysia",
+    type: "Full-time · On-site",
+    startDate: "Dec 2023",
+    endDate: "Jan 2024",
+    bullets: [
+      "Assisted with troubleshooting production machines in collaboration with software engineers in China.",
+    ],
+  },
+  {
+    company: "Lingkail Sdn Bhd",
+    role: "Full Stack Engineer",
+    location: "Bukit Mertajam, Penang, Malaysia",
+    type: "Full-time · On-site",
+    startDate: "Sep 2022",
+    endDate: "Dec 2023",
+    bullets: [
+      "Developed websites and web pages using .NET.",
+    ],
+  },
+  {
+    company: "Boon Siew Honda Sdn. Bhd.",
+    role: "Information Technology Trainee",
+    location: "Simpang Ampat, Penang, Malaysia",
+    type: "Internship · On-site",
+    startDate: "Dec 2019",
+    endDate: "Feb 2020",
+    bullets: [],
+  },
 ];
 
 export const projects: ProjectItem[] = [
@@ -92,7 +137,7 @@ export const projects: ProjectItem[] = [
     overview: "React and TypeScript dashboard with a task board, repository management, Codex thread controls and usage monitoring.", built: ["Coding tasks", "Repository context", "Codex threads"], architecture: ["TypeScript", "Developer workflow", "Codex"],
   },
   {
-    slug: "personal-resume-portfolio-website", title: "personal-resume-portfolio-website", description: "React portfolio and printable resume with an authenticated profile editor and persistent profile data in Cloudflare D1.", type: "Web portfolio", status: "Live site", technologies: ["TypeScript", "React", "Cloudflare"], github: "https://github.com/guangyou0716/personal-resume-portfolio-website", demo: "https://gy-portfolio.guangyou1386.chatgpt.site/", featured: true,
+    slug: "personal-resume-portfolio-website", title: "personal-resume-portfolio-website", description: "React portfolio and printable resume with an authenticated profile editor and persistent profile data in Cloudflare D1.", type: "Web portfolio", status: "Live site", technologies: ["TypeScript", "React", "Cloudflare"], github: "https://github.com/guangyou0716/personal-resume-portfolio-website", featured: true,
     overview: "React portfolio and printable resume with an authenticated profile editor and persistent profile data in Cloudflare D1.", built: ["Portfolio homepage", "Quick resume", "Editable profile content"], architecture: ["React", "Vite / vinext", "Cloudflare"],
   },
   {
@@ -106,13 +151,13 @@ export const projects: ProjectItem[] = [
 ];
 
 export const skillGroups: SkillGroup[] = [
-  { label: "Languages", items: ["Python", "C#", "JavaScript", "TypeScript", "SQL"] },
-  { label: "Frameworks", items: [".NET", "Avalonia", "React", "Next.js"] },
-  { label: "Backend & APIs", items: ["REST API", "JSON", "Authentication", "API Integration"] },
-  { label: "Databases", items: ["PostgreSQL", "MySQL", "SQLite"] },
-  { label: "Automation", items: ["Python Automation", "RPA", "Workflow Automation"] },
-  { label: "AI / Computer Vision", items: ["OpenCV", "AI APIs", "LLM workflows"] },
-  { label: "Tools", items: ["Git", "GitHub", "Docker", "VS Code", "Codex"] },
+  { label: "Languages & web", items: ["PHP", "C#", "Python", "HTML", "CSS"] },
+  { label: "Frameworks & UI", items: [".NET Framework", ".NET Avalonia UI", "ASP.NET", "Bootstrap", "Flutter", "MudBlazor", ".NET MAUI", ".NET Blazor", "MVVM"] },
+  { label: "Databases", items: ["PostgreSQL", "MySQL", "SQLite", "InfluxDB", "Microsoft SQL Server"] },
+  { label: "Systems & protocols", items: ["Smart Metering", "DLMS", "MQTT", "M-Bus", "Modbus", "TCP", "IEC", "Computer Networking"] },
+  { label: "Business integration", items: ["PayNet DuitNow", "LHDN MyInvois / MyTax", "Full-Stack Development"] },
+  { label: "AI & automation", items: ["AI Agents", "Agentic Workflows"] },
+  { label: "Tools & deployment", items: ["Grafana", "Docker", "WiX Toolset", "SQL Server Management Studio", "Visual Studio"] },
 ];
 
 export const workStyle = [
@@ -123,7 +168,11 @@ export const workStyle = [
   ["Use AI as an engineering tool", "I use AI to move faster while keeping implementation decisions reviewable."],
 ] as const;
 
-export const education: EducationItem[] = [];
+export const education: EducationItem[] = [
+  { qualification: "Bachelor’s degree (CGPA 3.72)", school: "Wawasan Open University (WOU)", field: "Computer Software Engineering", year: "Sep 2021 – Mar 2026", coursework: "" },
+  { qualification: "Diploma of Education (CGPA 3.60)", school: "Synergy College", field: "Network and System Administration/Administrator", year: "Jan 2018 – Mar 2021", coursework: "" },
+  { qualification: "SPM (1A, 7B, 1C, 1D)", school: "SMK Taman Perwira", field: "", year: "2013 – 2017", coursework: "" },
+];
 export const certifications: Array<{ name: string; issuer: string; date: string; link?: string }> = [];
 export const githubWork = projects.filter((project) => project.featured && project.github).map((project) => ({
   name: project.title,

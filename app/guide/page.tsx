@@ -7,7 +7,7 @@ import { Icon, SiteFooter, SiteHeader } from "../components";
 export const metadata: Metadata = { title: "Customize guide", robots: { index: false, follow: false }, description: "Private maintenance guide for updating this personal resume site." };
 
 const guideItems = [
-  ["Open the editor", "Visit /customize and sign in with the site owner account. Changes are saved for the public site."],
+  ["Open the editor", "Visit /customize. Cloudflare Access signs in the site owner. Changes are saved for the public site."],
   ["Change the introduction", "Use the private editor for your name, title, location, bio, summary, values and contact links. Hero description supplies the short profile in Quick resume; About summary stays on the portfolio."],
   ["Add experience", "Use the private editor to add or update experience. The homepage and Quick resume page update automatically."],
   ["Add a project", "Add one ProjectItem object to projects. Use a unique slug; the project card and detail page are generated for you."],

@@ -1,12 +1,14 @@
-# vinext-starter
+# Lee Guang You — portfolio
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+Personal resume and portfolio for Lee Guang You. The site runs on
+[vinext](https://github.com/cloudflare/vinext) and deploys to Cloudflare
+Workers. Profile copy lives in `app/data/profile.ts` and can be edited by the
+owner into a Cloudflare D1 database.
 
 ## Prerequisites
 
 - Node.js `>=22.13.0`
+- A free Cloudflare account, for deployment
 
 ## Quick Start
 
@@ -16,86 +18,64 @@ npm run dev
 npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+`wrangler.jsonc` declares the Worker and the D1 binding. With an empty
+database, the public pages render the profile defaults.
 
 ## Included Shape
 
 - edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
+- `wrangler.jsonc` declares the Worker, D1 database, and non-secret settings
+- `db/schema.ts` stores the editable profile
+- `drizzle/` holds the D1 migrations
 - `examples/d1/` contains an optional D1 example surface
 - `drizzle.config.ts` supports local migration generation when needed
 
-## Workspace Auth Headers
+## Deploy to Cloudflare (free)
 
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
+1. Create a free Cloudflare account.
+2. Log in: `npx wrangler login`
+3. Create the database and paste the printed id into `database_id` in `wrangler.jsonc`:
 
-The user ID is stable for the same user on the same Site and different across Sites. Email and name are intended for display or contact purposes.
+   ```bash
+   npx wrangler d1 create gy-portfolio-db
+   ```
 
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+4. Apply migrations: `npm run db:migrate:remote`
+5. Deploy: `npm run deploy`
 
-Treat the full name as optional and fall back to email when it is absent:
+Deploy prints a URL like `https://gy-portfolio.<subdomain>.workers.dev`.
 
-```tsx
-import { headers } from "next/headers";
+### Owner editor with Cloudflare Access
 
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
+The public site stays open. The editor fails closed until Access is configured:
+`POST /api/profile` returns 401, and `/customize` says the editor is not
+configured or you are not authorized.
 
-  const displayName = fullName ?? email;
-  // ...
-}
-```
+1. In the Cloudflare Zero Trust free plan, create a self-hosted Access application for the Workers hostname.
+2. Protect `/customize*`, `/api/profile*`, and `/guide*`.
+3. Add an Allow policy for the owner's email.
+4. Put these non-secret values in `wrangler.jsonc` `vars`, then redeploy with `npm run deploy`:
+   - `CF_ACCESS_TEAM_DOMAIN` — team domain only, such as `your-team.cloudflareaccess.com`
+   - `CF_ACCESS_AUD` — the application's Audience (AUD) tag
+   - `PORTFOLIO_EDITOR_EMAIL` — the owner email allowed to edit
+   - `PUBLIC_SITE_URL` — optional public origin, including `https://`. Quick resume uses the request origin when this is empty.
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+Owner access links to `/customize`. Access asks the visitor to sign in before that path runs. Sign out at `/cdn-cgi/access/logout`.
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
-
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
-
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+A free subdomain, such as one from [is-a.dev](https://is-a.dev), can point at the `workers.dev` hostname.
 
 ## Useful Commands
 
 - `npm run dev`: start local development
 - `npm run build`: verify the vinext build output
+- `npm run deploy`: build and deploy to Cloudflare Workers
+- `npm run db:migrate:remote`: apply D1 migrations to the remote database
 - `npm run typecheck`: verify TypeScript types
-- `npm test`: build the starter and verify its rendered HTML
+- `npm test`: build the site and verify its rendered HTML
 - `npm run db:generate`: generate Drizzle migrations after schema changes
 
 ## Learn More
 
 - [vinext Documentation](https://github.com/cloudflare/vinext)
 - [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+- [Validate Cloudflare Access JWTs](https://developers.cloudflare.com/cloudflare-one/identity/authorization-cookie/validating-json/)
