@@ -9,7 +9,7 @@
       "binding": "DB",
       "database_name": "gy-portfolio-db",
       // Paste the id printed by: npx wrangler d1 create gy-portfolio-db
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "a924e194-6269-40d2-80ff-b4fafbe4f3af",
       "migrations_dir": "drizzle"
     }
   ],
