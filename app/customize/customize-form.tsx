@@ -6,7 +6,7 @@ import type { GitHubRepository } from "../data/profile-server";
 
 export type SaveState = "idle" | "saving" | "saved" | "error" | "conflict";
 
-export default function CustomizeForm({ initialProfile, profileVersion, githubRepositories }: { initialProfile: EditableProfile; profileVersion: number | null; githubRepositories: GitHubRepository[] }) {
+export default function CustomizeForm({ initialProfile, profileVersion, githubRepositories, authMethod }: { initialProfile: EditableProfile; profileVersion: number | null; githubRepositories: GitHubRepository[]; authMethod: "access" | "password" }) {
   const [form, setForm] = useState<EditableProfile>(() => cloneProfile(initialProfile));
   const [valuesText, setValuesText] = useState(initialProfile.values.join("\n"));
   const [saveState, setSaveState] = useState<SaveState>("idle");
@@ -69,7 +69,9 @@ export default function CustomizeForm({ initialProfile, profileVersion, githubRe
   }
 
   const status = saveState === "saving" ? "Saving…" : saveState === "conflict" ? "This profile changed elsewhere. Reload the editor before saving." : saveState === "error" ? "Could not save. Please try again." : isDirty ? "Unsaved changes" : saveState === "saved" ? "All changes saved" : "No unsaved changes";
-  return <form id="customize-form" className="customize-form" onSubmit={save}>
+  return <>
+    {authMethod === "password" && <form id="editor-logout" method="post" action="/api/editor/logout" />}
+    <form id="customize-form" className="customize-form" onSubmit={save}>
     <nav className="customize-section-nav" aria-label="Editor sections">{[["profile", "Profile"], ["introduction", "Introduction"], ["experience", "Experience"], ["skills", "Skills & technologies"], ["education", "Education"], ["github", "GitHub covers"], ["contact", "Contact links"]].map(([id, label]) => <a href={`#customize-${id}`} key={id}>{label}</a>)}</nav>
     <div className="customize-fields">
       <fieldset disabled={saveState === "saving"}>
@@ -82,9 +84,10 @@ export default function CustomizeForm({ initialProfile, profileVersion, githubRe
         <section id="customize-github"><h2>GitHub covers</h2>{githubRepositories.length ? <div className="customize-list">{githubRepositories.map((repo) => <div className="customize-item" key={repo.name}><label>{repo.name} cover image URL<input type="text" value={form.githubCovers[repo.name] ?? ""} onChange={(event) => updateGitHubCover(repo.name, event.target.value)} placeholder="https://... or /profile/project-cover.jpg" /></label></div>)}</div> : <p className="customize-help">Add a public GitHub profile URL in Contact links, save it, then reload this page to edit repository covers.</p>}<p className="customize-help">Paste a public image URL, including a GitHub Social preview URL, or a site path such as /profile/project-cover.jpg. Leave blank for a simple project label.</p></section>
         <section id="customize-contact"><h2>Contact links</h2><div className="customize-grid"><label>Email<input type="email" value={form.email} onChange={(event) => update("email", event.target.value)} /></label><label>GitHub URL<input type="url" value={form.socials.github} onChange={(event) => updateSocial("github", event.target.value)} /></label><label>LinkedIn URL<input type="url" value={form.socials.linkedin} onChange={(event) => updateSocial("linkedin", event.target.value)} /></label><label>Email link<input type="text" value={form.socials.email} onChange={(event) => updateSocial("email", event.target.value)} /></label></div><p className="customize-help">Use a public GitHub profile URL to load repository cover fields. After changing the URL, save changes and reload the editor.</p></section>
       </fieldset>
-      <div className="customize-actions" data-state={isDirty && saveState === "saved" ? "idle" : saveState}><button className="button button--primary" type="submit" disabled={saveState === "saving" || saveState === "conflict" || !isDirty} aria-busy={saveState === "saving"}>Save changes</button>{saveState === "conflict" && <a className="text-link" href="/customize">Reload editor</a>}<a className="text-link" href="/cdn-cgi/access/logout">Sign out</a><span aria-live="polite" role="status">{status}</span></div>
+      <div className="customize-actions" data-state={isDirty && saveState === "saved" ? "idle" : saveState}><button className="button button--primary" type="submit" disabled={saveState === "saving" || saveState === "conflict" || !isDirty} aria-busy={saveState === "saving"}>Save changes</button>{saveState === "conflict" && <a className="text-link" href="/customize">Reload editor</a>}{authMethod === "password" ? <button className="text-link" type="submit" form="editor-logout">Sign out</button> : <a className="text-link" href="/cdn-cgi/access/logout">Sign out</a>}<span aria-live="polite" role="status">{status}</span></div>
     </div>
-  </form>;
+  </form>
+  </>;
 }
 
 function snapshot(form: EditableProfile, valuesText: string) {

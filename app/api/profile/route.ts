@@ -1,14 +1,17 @@
-import { getAccessUser } from "../../auth";
-import { isProfileEditor, saveProfile } from "../../data/profile-server";
+import { getEditorUser } from "../../auth";
+import { saveProfile } from "../../data/profile-server";
+import { isSameOrigin } from "../../same-origin";
 
 export async function POST(request: Request) {
-  const user = await getAccessUser();
-  if (!user || !(await isProfileEditor(user))) {
-    return Response.json({ error: "Not authorized" }, { status: 401 });
-  }
-  const origin = request.headers.get("origin");
-  if (origin && new URL(origin).host !== request.headers.get("host")) {
+  if (!isSameOrigin(request)) {
     return Response.json({ error: "Invalid origin" }, { status: 403 });
+  }
+  if (!isJsonContentType(request.headers.get("content-type"))) {
+    return Response.json({ error: "Expected application/json" }, { status: 415 });
+  }
+  const user = await getEditorUser();
+  if (!user) {
+    return Response.json({ error: "Not authorized" }, { status: 401 });
   }
   try {
     const payload = await request.json() as { profile?: unknown; expectedUpdatedAt?: unknown };
@@ -24,4 +27,9 @@ export async function POST(request: Request) {
   } catch {
     return Response.json({ error: "Unable to save the profile yet. Please try again shortly." }, { status: 400 });
   }
+}
+
+function isJsonContentType(value: string | null): boolean {
+  const mediaType = value?.split(";")[0]?.trim().toLowerCase();
+  return mediaType === "application/json";
 }

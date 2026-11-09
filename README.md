@@ -47,9 +47,9 @@ Deploy prints a URL like `https://gy-portfolio.<subdomain>.workers.dev`.
 
 ### Owner editor with Cloudflare Access
 
-The public site stays open. The editor fails closed until Access is configured:
-`POST /api/profile` returns 401, and `/customize` says the editor is not
-configured or you are not authorized.
+The public site stays open. The editor fails closed until Cloudflare Access or
+a password is configured: `POST /api/profile` returns 401, and `/customize`
+says the editor is not configured or you are not authorized.
 
 1. In the Cloudflare Zero Trust free plan, create a self-hosted Access application for the Workers hostname.
 2. Protect `/customize*`, `/api/profile*`, and `/guide*`.
@@ -58,9 +58,35 @@ configured or you are not authorized.
    - `CF_ACCESS_TEAM_DOMAIN` — team domain only, such as `your-team.cloudflareaccess.com`
    - `CF_ACCESS_AUD` — the application's Audience (AUD) tag
    - `PORTFOLIO_EDITOR_EMAIL` — the owner email allowed to edit
-   - `PUBLIC_SITE_URL` — optional public origin, including `https://`. Quick resume uses the request origin when this is empty.
+   - `PUBLIC_SITE_URL` — public origin, including `https://`. This repo sets `https://gy-portfolio.guangyou.workers.dev`. Page metadata and the quick resume portfolio link use it. When it is empty, they use the request `Host` header and accept only `http` and `https`.
 
 Owner access links to `/customize`. Access asks the visitor to sign in before that path runs. Sign out at `/cdn-cgi/access/logout`.
+
+### Owner editor with a password
+
+If you cannot enable Cloudflare Zero Trust, set an owner password instead. The
+editor is authorized with either a valid Access JWT for
+`PORTFOLIO_EDITOR_EMAIL` or a valid password session cookie.
+
+```bash
+npx wrangler secret put EDITOR_PASSWORD
+npx wrangler secret put EDITOR_SESSION_SECRET
+```
+
+`EDITOR_PASSWORD` must be at least 12 characters. Generate
+`EDITOR_SESSION_SECRET` with `openssl rand -base64 48` (at least 32
+characters). Do not put these values in `wrangler.jsonc` `vars`. Redeploy after
+setting secrets: `npm run deploy`. Changing `EDITOR_PASSWORD` signs out every
+existing session.
+
+Apply D1 migrations so login rate limits can be stored:
+
+```bash
+npm run db:migrate:remote
+```
+
+Then open `/customize` and sign in with the password. Sign out from the editor
+clears the session cookie.
 
 A free subdomain, such as one from [is-a.dev](https://is-a.dev), can point at the `workers.dev` hostname.
 

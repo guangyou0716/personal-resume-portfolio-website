@@ -5,3 +5,9 @@ export const portfolioProfile = sqliteTable("portfolio_profile", {
   content: text("content").notNull(),
   updatedAt: integer("updated_at").notNull(),
 });
+
+export const editorLoginAttempts = sqliteTable("editor_login_attempts", {
+  key: text("key").primaryKey(),
+  failures: integer("failures").notNull(),
+  windowStart: integer("window_start").notNull(),
+});

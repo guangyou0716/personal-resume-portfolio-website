@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { isEditorEmail } from "../access-jwt";
-import { getAccessUser } from "../auth";
+import { getEditorUser, isPasswordEditorSession } from "../auth";
 import { configuredEnv, readWorkerEnv } from "../worker-env";
 import { portfolioProfile } from "../../db/schema";
 import { education, experience, profile, skillGroups, type EditableProfile, type EducationItem, type ExperienceItem, type SkillGroup, type SocialLinks } from "./profile";
@@ -71,12 +71,13 @@ export async function saveProfile(input: unknown, expectedUpdatedAt: number | nu
 }
 
 export async function requireProfileEditor() {
-  const user = await getAccessUser();
-  if (!user || !(await isProfileEditor(user))) notFound();
+  const user = await getEditorUser();
+  if (!user) notFound();
   return user;
 }
 
-export async function isProfileEditor(user: { email: string }) {
+export async function isProfileEditor(user: { email: string; method?: string }) {
+  if (user.method === "password") return isPasswordEditorSession(user);
   return isEditorEmail(user.email, configuredEnv(await readWorkerEnv("PORTFOLIO_EDITOR_EMAIL")));
 }
 
