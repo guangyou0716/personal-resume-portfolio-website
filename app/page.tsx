@@ -28,7 +28,7 @@ export default async function Home() {
         <div className="hero-copy">
           <h1 id="home-title"><span>{profile.name}</span><br /><strong>{profile.title}</strong></h1>
           <p className="hero-tagline">{profile.subtitle}</p>
-          <p className="hero-lede">{profile.bio}</p>{profile.summary && <p className="hero-summary">{profile.summary}</p>}
+          <p className="hero-lede">{profile.bio}</p>{summaryParagraphs(profile.summary).map((paragraph) => <p className="hero-summary" key={paragraph}>{paragraph}</p>)}
           <div className="hero-actions"><a className="button button--primary" href="#projects">View my work <Icon name="arrow" /></a><a className="button button--secondary" href={profile.resumeFile}>View resume <Icon name="arrow" /></a></div>
           <div className="hero-links"><a href={profile.socials.github}><Icon name="github" size={17} />GitHub <Icon name="external" size={14} /></a><a href={profile.socials.linkedin}><Icon name="linkedin" size={17} />LinkedIn <Icon name="external" size={14} /></a><a href={profile.socials.email}><Icon name="mail" size={17} />Email <Icon name="external" size={14} /></a></div>
         </div>
@@ -40,7 +40,7 @@ export default async function Home() {
         <div className="project-grid">{featuredProjects.map((project) => <ProjectCard key={project.slug} project={project} coverImage={profile.githubCovers[project.title] || project.coverImage} />)}</div>
       </section>
 
-      {hasExperience && <section className="section container" id="experience"><SectionHeading index="03" title="Experience" /><div className="timeline">{profile.experience.map((item) => <article className="timeline-item" key={`${item.company}-${item.role}`}><div className="timeline-date"><span>{item.startDate}</span><span>{item.endDate}</span></div><div className="timeline-marker" aria-hidden="true" /><div className="timeline-content"><h3>{item.role}</h3><p className="timeline-meta">{item.company} · {item.location} · {item.type}</p><ul>{item.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>{item.impact && <p className="impact"><strong>Impact</strong>{item.impact}</p>}</div></article>)}</div></section>}
+      {hasExperience && <section className="section container" id="experience"><SectionHeading index="03" title="Experience" /><div className="timeline">{profile.experience.map((item) => <article className="timeline-item" key={`${item.company}-${item.role}`}><div className="timeline-date"><span>{item.startDate}</span><span>{item.endDate}</span></div><div className="timeline-marker" aria-hidden="true" /><div className="timeline-content"><h3>{item.role}</h3><p className="timeline-meta">{item.company} · {item.location} · {item.type}</p>{item.bullets.some((bullet) => bullet.trim()) && <ul>{item.bullets.filter((bullet) => bullet.trim()).map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}{item.impact && <p className="impact"><strong>Impact</strong>{item.impact}</p>}</div></article>)}</div></section>}
 
       <section className="section container" id="skills"><div className="skills-work-grid"><div className="skill-groups"><SectionHeading index={skillsIndex} title="Skills & technologies" />{profile.skillGroups.length ? profile.skillGroups.map((group) => <div className="skill-group" key={group.label}><h3>{group.label}</h3><div className="tag-row">{group.items.map((skill) => <span key={skill}>{skill}</span>)}</div></div>) : <p className="empty-state"></p>}</div><div className="work-style-list"><SectionHeading index={workStyleIndex} title="How I work" />{workStyle.map(([title, text], index) => <article key={title}><span className="work-style-number" aria-hidden="true">0{index + 1}</span><div><h3>{title}</h3><p>{text}</p></div></article>)}</div></div></section>
 
@@ -52,4 +52,8 @@ export default async function Home() {
     </main>
     <SiteFooter />
   </>;
+}
+
+function summaryParagraphs(summary: string) {
+  return summary.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean);
 }

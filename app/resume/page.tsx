@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import PrintButton from "../print-button";
 import "./resume.css";
 import { Icon, SiteFooter, SiteHeader } from "../components";
 import { certifications } from "../data/profile";
 import { getProfile } from "../data/profile-server";
+import { configuredEnv, readWorkerEnv } from "../worker-env";
 
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfile();
@@ -12,10 +14,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const dynamic = "force-dynamic";
-const portfolioUrl = "https://gy-portfolio.guangyou1386.chatgpt.site";
 
 export default async function ResumePage() {
   const profile = await getProfile();
+  const portfolioUrl = await portfolioOrigin();
   const summary = [profile.bio, profile.summary].find(hasResumeContent);
   const experience = profile.experience.filter((item) => hasResumeContent(item.role) && hasResumeContent(item.company));
   const education = profile.education.filter((item) => hasResumeContent(item.qualification) && hasResumeContent(item.school) && !/^SPM\b/i.test(item.qualification));
@@ -35,5 +37,15 @@ function hasResumeContent(value: string | undefined): value is string {
 
 function displayUrl(value: string) {
   return value.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+}
+
+async function portfolioOrigin() {
+  const configured = configuredEnv(await readWorkerEnv("PUBLIC_SITE_URL"));
+  if (configured) return configured;
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  if (!host) return "";
+  const protocol = (requestHeaders.get("x-forwarded-proto") ?? "http").split(",")[0]?.trim() || "http";
+  return `${protocol}://${host}`;
 }
 

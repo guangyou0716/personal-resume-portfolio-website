@@ -1,7 +1,9 @@
 import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { requireChatGPTUser } from "../chatgpt-auth";
+import { isEditorEmail } from "../access-jwt";
+import { getAccessUser } from "../auth";
+import { configuredEnv, readWorkerEnv } from "../worker-env";
 import { portfolioProfile } from "../../db/schema";
 import { education, experience, profile, skillGroups, type EditableProfile, type EducationItem, type ExperienceItem, type SkillGroup, type SocialLinks } from "./profile";
 
@@ -69,14 +71,13 @@ export async function saveProfile(input: unknown, expectedUpdatedAt: number | nu
 }
 
 export async function requireProfileEditor() {
-  const user = await requireChatGPTUser("/customize");
-  if (!(await isProfileEditor(user))) notFound();
+  const user = await getAccessUser();
+  if (!user || !(await isProfileEditor(user))) notFound();
   return user;
 }
 
-export async function isProfileEditor(user: { userId: string; email: string }) {
-  const [editorUserId, editorEmail] = await Promise.all([getEditorUserId(), getEditorEmail()]);
-  return user.userId === editorUserId || Boolean(editorEmail && user.email.toLowerCase() === editorEmail.toLowerCase());
+export async function isProfileEditor(user: { email: string }) {
+  return isEditorEmail(user.email, configuredEnv(await readWorkerEnv("PORTFOLIO_EDITOR_EMAIL")));
 }
 
 export type GitHubRepository = { name: string; description: string; htmlUrl: string; language: string; stars: number };
@@ -105,24 +106,6 @@ export const getGitHubRepositories = cache(async (githubUrl: string): Promise<Gi
     return [];
   }
 });
-
-export async function getEditorUserId() {
-  try {
-    const { env } = await import("cloudflare:workers");
-    return (env as unknown as Record<string, string | undefined>).PORTFOLIO_EDITOR_USER_ID ?? process.env.PORTFOLIO_EDITOR_USER_ID;
-  } catch {
-    return process.env.PORTFOLIO_EDITOR_USER_ID;
-  }
-}
-
-export async function getEditorEmail() {
-  try {
-    const { env } = await import("cloudflare:workers");
-    return (env as unknown as Record<string, string | undefined>).PORTFOLIO_EDITOR_EMAIL ?? process.env.PORTFOLIO_EDITOR_EMAIL;
-  } catch {
-    return process.env.PORTFOLIO_EDITOR_EMAIL;
-  }
-}
 
 async function getDb() {
   return (await import("../../db")).getDb();
