@@ -124,7 +124,7 @@ test("homepage keeps curated projects and resume stays focused when GitHub is un
     return originalFetch(input, ...args);
   };
   try {
-    for (const pathname of ["/", "/resume"]) {
+    for (const pathname of ["/", "/resume", "/projects/codex-board"]) {
       const response = await render(pathname);
       assert.equal(response.status, 200);
       const html = await response.text();
@@ -132,8 +132,10 @@ test("homepage keeps curated projects and resume stays focused when GitHub is un
         for (const slug of ["codex-board", "personal-resume-portfolio-website", "codex-workflow-toolkit"]) {
           assert.match(html, new RegExp(`href="(?:https://gy-portfolio\\.guangyou1386\\.chatgpt\\.site)?/projects/${slug}"`));
         }
-      } else {
+      } else if (pathname === "/resume") {
         assert.doesNotMatch(html, /Selected projects|resume-project/);
+      } else {
+        assert.match(html, /Engineering decisions (?:&amp;|&) evidence/);
       }
       assert.doesNotMatch(html, /Public repository on GitHub\./);
     }
@@ -482,6 +484,52 @@ test("profile writes require application/json", async () => {
     body: "{}",
   });
   assert.equal(charset.status, 401);
+});
+
+test("codex-board case study cites immutable source and other projects omit it", async () => {
+  const codex = await render("/projects/codex-board");
+  assert.equal(codex.status, 200);
+  const html = await codex.text();
+  for (const heading of ["Problem", "Architecture", "Limitations"]) {
+    assert.match(html, new RegExp(`<h2>${heading}</h2>`));
+  }
+  assert.match(html, /<h2>Engineering decisions (?:&amp;|&) evidence<\/h2>/);
+  assert.match(html, /Overview/);
+  assert.match(html, /Highlights/);
+  assert.match(html, /installed Codex CLI/);
+  assert.match(html, /Public transport, remote pairing/);
+  assert.match(html, /are not handwritten/);
+  assert.match(html, /does not report a bridge test run/);
+  assert.match(html, /does not establish individual contribution/);
+  assert.match(html, /not a measured customer problem/);
+  assert.doesNotMatch(html, /all tests pass|tests passed|I built every line|paying users|security certification|performance gain|coverage percentage/i);
+
+  const evidence = [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)].flatMap((match) => {
+    const href = match[1].match(/href="([^"]*)"/)?.[1];
+    if (!href?.startsWith("https://github.com/guangyou0716/codex-board/blob/c287c280604eb7e63d0ca14df9b8d754e094ccbb/")) return [];
+    const rel = match[1].match(/rel="([^"]*)"/)?.[1] ?? "";
+    const label = match[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return [{ href, rel, label }];
+  });
+  assert.ok(evidence.length >= 3, "expected at least three immutable source links");
+  for (const link of evidence) {
+    const url = new URL(link.href);
+    assert.equal(url.protocol, "https:");
+    assert.equal(url.hostname, "github.com");
+    assert.match(url.pathname, /^\/guangyou0716\/codex-board\/blob\/c287c280604eb7e63d0ca14df9b8d754e094ccbb\/(?:bridge\/(?:README\.md|path-security\.ts|server\.ts)|tests\/bridge\.test\.mjs)$/);
+    assert.match(url.hash, /^#L\d+(?:-L\d+)?$/);
+    assert.match(link.rel, /\bnoreferrer\b/);
+    assert.match(link.label, /[A-Za-z]/);
+    assert.doesNotMatch(link.label, /^https?:/i);
+  }
+
+  const other = await render("/projects/personal-resume-portfolio-website");
+  assert.equal(other.status, 200);
+  const otherHtml = await other.text();
+  assert.match(otherHtml, /<h2>Overview<\/h2>/);
+  assert.match(otherHtml, /<h2>Highlights<\/h2>/);
+  assert.match(otherHtml, /Stack &amp; focus|Stack & focus/);
+  assert.doesNotMatch(otherHtml, /<h2>Problem<\/h2>|<h2>Engineering decisions|<h2>Limitations<\/h2>/);
 });
 
 function accessClaims(overrides = {}) {
