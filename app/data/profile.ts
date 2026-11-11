@@ -18,6 +18,17 @@ export type ExperienceItem = {
 export type SkillGroup = { label: string; items: string[] };
 export type EducationItem = { qualification: string; school: string; field: string; year: string; coursework: string };
 
+export type ProjectCaseStudy = {
+  problem: string;
+  architecture: string[];
+  decisions: {
+    title: string;
+    rationale: string;
+    evidence: { label: string; href: string }[];
+  }[];
+  limitations: string[];
+};
+
 export type ProjectItem = {
   slug: string;
   title: string;
@@ -33,6 +44,7 @@ export type ProjectItem = {
   overview?: string;
   built?: string[];
   architecture?: string[];
+  caseStudy?: ProjectCaseStudy;
 };
 
 export function displayProjectName(name: string) {
@@ -81,6 +93,53 @@ export type EditableProfile = {
   skillGroups: SkillGroup[];
   education: EducationItem[];
   githubCovers: Record<string, string>;
+};
+
+const codexBoardSource = "https://github.com/guangyou0716/codex-board/blob/c287c280604eb7e63d0ca14df9b8d754e094ccbb";
+
+const codexBoardCaseStudy: ProjectCaseStudy = {
+  problem: "A coding dashboard needs explicit repository context, visible threads and tasks, and a constrained local integration boundary. The local bridge documentation records that design. It is not a measured customer problem or a usage result.",
+  architecture: [
+    "The local integration path is the browser UI, then a local structured HTTP and event bridge, then LocalCodexAdapter, then one codex app-server --stdio child. Raw App Server messages stay behind AppServerProcess and CodexAppServerClient.",
+    "Approved-root Git status and diff are read-only. Turn start and turn interruption are separate capabilities. Task configuration uses a readOnly sandbox only when that mode is requested; otherwise the sandbox mode is workspaceWrite.",
+    "Checked-in TypeScript under generated/codex-app-server/ is produced from the installed Codex CLI and must not be edited by hand. Those protocol messages are normalized into domain events before React sees them.",
+  ],
+  decisions: [
+    {
+      title: "Canonical approved roots",
+      rationale: "Each approved root is canonicalized with realpath. The bridge rejects a filesystem root, the home directory, credential or system directory segments, and repository paths outside those roots. The bridge documentation also says it refuses path traversal and symlink escapes, and that there is no generic shell endpoint. Test cases cover canonical roots, parent-path escapes, filesystem-root rejection, and home-directory rejection. Those cases existing is not a test result.",
+      evidence: [
+        { label: "Approved-root checks", href: `${codexBoardSource}/bridge/path-security.ts#L34-L76` },
+        { label: "Root and escape tests", href: `${codexBoardSource}/tests/bridge.test.mjs#L12-L30` },
+        { label: "Path refusal rules", href: `${codexBoardSource}/bridge/README.md#L21-L24` },
+      ],
+    },
+    {
+      title: "Normalized protocol boundary",
+      rationale: "Raw App Server messages stay behind AppServerProcess and CodexAppServerClient. React receives normalized domain events through LocalCodexAdapter. A test case maps an unknown notification method to type unknown, so the unrecognized method is not the UI event type. Generated protocol files are not handwritten.",
+      evidence: [
+        { label: "Adapter boundary", href: `${codexBoardSource}/bridge/README.md#L26-L38` },
+        { label: "Unknown-event test", href: `${codexBoardSource}/tests/bridge.test.mjs#L53-L59` },
+      ],
+    },
+    {
+      title: "Local-only transport and unavailable states",
+      rationale: "The bridge binds to 127.0.0.1 port 4321 by default. CODEX_BRIDGE_HOST rejects non-loopback values. CODEX_ALLOWED_ORIGINS can replace the small default origin allowlist. Public transport and remote pairing are deferred. The trade-off is that use depends on a local Codex CLI and approved roots on that machine.",
+      evidence: [
+        { label: "Loopback and origins", href: `${codexBoardSource}/bridge/README.md#L17-L20` },
+        { label: "Deferred remote transport", href: `${codexBoardSource}/bridge/README.md#L48-L49` },
+        { label: "Turn and Git capabilities", href: `${codexBoardSource}/bridge/server.ts#L17-L31` },
+        { label: "Task sandbox configuration", href: `${codexBoardSource}/bridge/server.ts#L45-L52` },
+      ],
+    },
+  ],
+  limitations: [
+    "The local bridge expects an installed Codex CLI.",
+    "Public transport, remote pairing, GitHub writes, and commit, push, merge, pull request, deploy, and desktop repository automation are deferred.",
+    "Files under generated/codex-app-server/ are generated from the Codex CLI and are not handwritten.",
+    "This page does not report a bridge test run, a coverage figure, a bridge deployment, or observed runtime behavior.",
+    "The repository snapshot does not establish individual contribution, personal usage, or measured impact.",
+  ],
 };
 
 export const experience: ExperienceItem[] = [
@@ -135,6 +194,7 @@ export const projects: ProjectItem[] = [
   {
     slug: "codex-board", title: "codex-board", description: "React and TypeScript dashboard with a task board, repository management, Codex thread controls and usage monitoring.", type: "Developer tooling", status: "Public repository", technologies: ["React", "TypeScript"], github: "https://github.com/guangyou0716/codex-board", featured: true,
     overview: "React and TypeScript dashboard with a task board, repository management, Codex thread controls and usage monitoring.", built: ["Coding tasks", "Repository context", "Codex threads"], architecture: ["TypeScript", "Developer workflow", "Codex"],
+    caseStudy: codexBoardCaseStudy,
   },
   {
     slug: "personal-resume-portfolio-website", title: "personal-resume-portfolio-website", description: "React portfolio and printable resume with an authenticated profile editor and persistent profile data in Cloudflare D1.", type: "Web portfolio", status: "Live site", technologies: ["TypeScript", "React", "Cloudflare"], github: "https://github.com/guangyou0716/personal-resume-portfolio-website", featured: true,
