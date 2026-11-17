@@ -161,7 +161,7 @@ test("homepage and resume render the live profile", async () => {
   }
   assert.match(home, /I’m a technology enthusiast with a passion for software development/);
   assert.match(home, /SMK Taman Perwira/);
-  assert.match(home, /Boon Siew Honda Sdn\. Bhd\./);
+  assert.match(home, /Boon Siew Honda Sdn Bhd/);
   assert.doesNotMatch(home, /<ul>\s*<\/ul>/);
   assert.doesNotMatch(resume, /SMK Taman Perwira/);
   assert.match(resume, />localhost</);
@@ -172,7 +172,7 @@ test("homepage and resume render the live profile", async () => {
   process.env.PUBLIC_SITE_URL = "https://portfolio.example.test";
   try {
     const configured = await (await render("/resume")).text();
-    assert.match(configured, />portfolio\.example\.test</);
+    assert.match(configured, /portfolio\.<wbr ?\/?>example\.<wbr ?\/?>test/);
     assert.doesNotMatch(configured, /chatgpt\.site/);
   } finally {
     delete process.env.PUBLIC_SITE_URL;
@@ -186,6 +186,36 @@ test("homepage and resume render the live profile", async () => {
   } finally {
     delete process.env.PUBLIC_SITE_URL;
   }
+});
+
+
+test("resume typography keeps labels, dates, skills and contact values intact", async () => {
+  const resume = await (await render("/resume")).text();
+  assert.match(resume, />Email<\/dt>/);
+  assert.match(resume, />Portfolio<\/dt>/);
+  assert.match(resume, />GitHub<\/dt>/);
+  assert.match(resume, />LinkedIn<\/dt>/);
+  assert.match(resume, /guangyou7953@<wbr ?\/?>outlook\.<wbr ?\/?>com/);
+  assert.match(resume, /github\.<wbr ?\/?>com\/<wbr ?\/?>guangyou0716/);
+  assert.match(resume, /www\.<wbr ?\/?>linkedin\.<wbr ?\/?>com\/<wbr ?\/?>in\/<wbr ?\/?>lee\u2011guang\u2011you\u2011729a12aa/);
+  assert.match(resume, /Full-Stack Engineer|Full\u2011Stack Engineer/);
+  assert.match(resume, /Boon Siew Honda Sdn Bhd/);
+  assert.doesNotMatch(resume, /Sdn\. Bhd\./);
+  assert.match(resume, /Develop and maintain PHP-based web applications|Develop and maintain PHP\u2011based web applications/);
+  assert.match(resume, /Contribute to PayNet DuitNow/);
+  assert.match(resume, /Support smart meter power monitoring/);
+  assert.match(resume, /Support industrial production machines/);
+  assert.doesNotMatch(resume, /Developed and maintained PHP-based/);
+  assert.doesNotMatch(resume, /Contributed to PayNet DuitNow/);
+  assert.match(resume, /class="resume-skill"/);
+  assert.match(resume, /class="resume-company"/);
+  assert.match(resume, /class="resume-nowrap"/);
+  assert.match(resume, /Mar 2024 \u2013 Present/);
+  assert.doesNotMatch(resume, /Mar 2024 \u2014 Present/);
+  assert.match(resume, /Sep 2021 \u2013 Mar 2026/);
+  assert.match(resume, /e\u2011Invoicing/);
+  assert.match(resume, /Full\u2011time/);
+  assert.match(resume, /Smart Metering/);
 });
 
 test("verifyAccessJwt accepts a valid Access token and rejects invalid ones", async () => {
