@@ -6,7 +6,7 @@ import { Icon, SiteFooter, SiteHeader } from "../components";
 import { certifications } from "../data/profile";
 import { getProfile } from "../data/profile-server";
 import { publicSiteOrigin } from "../site-origin";
-import { BreakableUrl, formatDateRange, NowrapList, protectHyphenated, RoleCompany, SkillList } from "./typography";
+import { BreakableUrl, formatDateRange, NowrapList, protectHyphenated, RoleCompany, SkillList, VisibleUrl } from "./typography";
 
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfile();
@@ -47,10 +47,10 @@ export default async function ResumePage() {
               </div>
             </div>
             <dl className="resume-contact resume-contact--urls">
-              <div><dt>Email</dt><dd><a href={profile.socials.email}><BreakableUrl value={profile.email} /></a></dd></div>
-              <div><dt>Portfolio</dt><dd><a href={portfolioUrl}><BreakableUrl value={portfolioUrl} /></a></dd></div>
-              <div><dt>GitHub</dt><dd><a href={profile.socials.github}><BreakableUrl value={profile.socials.github} /></a></dd></div>
-              <div><dt>LinkedIn</dt><dd><a href={profile.socials.linkedin}><BreakableUrl value={profile.socials.linkedin} /></a></dd></div>
+              <div><dt>Email</dt><dd><a href={profile.socials.email}><VisibleUrl value={profile.email} /></a></dd></div>
+              <div><dt>Portfolio</dt><dd><a href={portfolioUrl}><VisibleUrl value={portfolioUrl} /></a></dd></div>
+              <div><dt>GitHub</dt><dd><a href={profile.socials.github}><VisibleUrl value={profile.socials.github} /></a></dd></div>
+              <div><dt>LinkedIn</dt><dd><a href={profile.socials.linkedin}><VisibleUrl value={profile.socials.linkedin} /></a></dd></div>
             </dl>
           </header>
           <div className="resume-columns">
