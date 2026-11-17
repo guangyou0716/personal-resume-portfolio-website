@@ -151,10 +151,10 @@ export const experience: ExperienceItem[] = [
     startDate: "Mar 2024",
     endDate: "Present",
     bullets: [
-      "Developed and maintained PHP-based web applications to support business operations.",
-      "Contributed to PayNet DuitNow payment and LHDN MyInvois e-Invoicing API integrations.",
-      "Supported smart meter power monitoring and data collection, including operations for Singapore’s National Day Parade (NDP).",
-      "Supported industrial production machines through software and hardware integration and automation.",
+      "Develop and maintain PHP-based web applications to support business operations.",
+      "Contribute to PayNet DuitNow payment and LHDN MyInvois e-Invoicing API integrations.",
+      "Support smart meter power monitoring and data collection, including operations for Singapore’s National Day Parade (NDP).",
+      "Support industrial production machines through software and hardware integration and automation.",
     ],
   },
   {
@@ -170,7 +170,7 @@ export const experience: ExperienceItem[] = [
   },
   {
     company: "Lingkail Sdn Bhd",
-    role: "Full Stack Engineer",
+    role: "Full-Stack Engineer",
     location: "Bukit Mertajam, Penang, Malaysia",
     type: "Full-time · On-site",
     startDate: "Sep 2022",
@@ -180,7 +180,7 @@ export const experience: ExperienceItem[] = [
     ],
   },
   {
-    company: "Boon Siew Honda Sdn. Bhd.",
+    company: "Boon Siew Honda Sdn Bhd",
     role: "Information Technology Trainee",
     location: "Simpang Ampat, Penang, Malaysia",
     type: "Internship · On-site",

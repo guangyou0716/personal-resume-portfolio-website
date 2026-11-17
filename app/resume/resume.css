@@ -138,10 +138,15 @@
   font-size: 15px;
   font-weight: 600;
 }
-.resume-sheet--editorial .resume-skills span {
+.resume-sheet--editorial .resume-skills .resume-skill-list {
   display: block;
   font-size: 15px;
   line-height: 1.8;
+}
+.resume-nowrap,
+.resume-skill,
+.resume-company {
+  white-space: nowrap;
 }
 @media (max-width: 1000px) {
   .resume-sheet.resume-sheet--editorial { padding: 40px; }
@@ -230,14 +235,15 @@
   padding-top: 3px;
   white-space: nowrap;
 }
-.resume-contact--urls dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.resume-contact--urls dd { margin: 0; min-width: 0; overflow-wrap: normal; word-break: normal; hyphens: none; }
 .resume-sheet--editorial .resume-contact--urls a,
 .resume-visible-url {
   display: inline-block;
   min-height: 0;
   max-width: 100%;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
   word-break: normal;
+  hyphens: none;
   font-size: 13px;
   line-height: 1.65;
   color: var(--primary);
@@ -256,4 +262,15 @@
   .resume-sheet--editorial .resume-contact--urls a,
   .resume-visible-url { font-size: 9pt; line-height: 1.4; color: #244489; }
   .resume-contact--urls dt { font-size: 8.5pt; }
+}
+
+/* Override globals.css overflow-wrap:anywhere so typography helpers control breaks. */
+.resume-sheet--editorial .resume-contact {
+  overflow-wrap: normal;
+}
+.resume-sheet--editorial .resume-item h3,
+.resume-sheet--editorial .resume-education h3 {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
 }
