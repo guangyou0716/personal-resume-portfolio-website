@@ -24,7 +24,19 @@ export function protectHyphenated(value: string) {
 }
 
 export function displayUrl(value: string) {
-  return value.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+  return value.replace(/^https?:\/\//i, "").replace(/^www\./i, "").replace(/\/$/, "");
+}
+
+/** Screen text can break at separators; print uses a single un-broken run so PDF annotations stay one rect. */
+export function VisibleUrl({ value }: { value: string }) {
+  return (
+    <>
+      <span className="resume-url-break">
+        <BreakableUrl value={value} />
+      </span>
+      <span className="resume-url-solid">{protectHyphenated(displayUrl(value))}</span>
+    </>
+  );
 }
 
 /** Break a URL or email only after ".", "/", or "@"; hyphens in the value stay intact. */

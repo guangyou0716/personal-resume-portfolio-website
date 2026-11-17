@@ -195,9 +195,15 @@ test("resume typography keeps labels, dates, skills and contact values intact", 
   assert.match(resume, />Portfolio<\/dt>/);
   assert.match(resume, />GitHub<\/dt>/);
   assert.match(resume, />LinkedIn<\/dt>/);
+  assert.match(resume, /href="mailto:guangyou7953@outlook\.com"/);
+  assert.match(resume, /href="https:\/\/www\.linkedin\.com\/in\/lee-guang-you-729a12aa"/);
   assert.match(resume, /guangyou7953@<wbr ?\/?>outlook\.<wbr ?\/?>com/);
   assert.match(resume, /github\.<wbr ?\/?>com\/<wbr ?\/?>guangyou0716/);
-  assert.match(resume, /www\.<wbr ?\/?>linkedin\.<wbr ?\/?>com\/<wbr ?\/?>in\/<wbr ?\/?>lee\u2011guang\u2011you\u2011729a12aa/);
+  assert.match(resume, /linkedin\.<wbr ?\/?>com\/<wbr ?\/?>in\/<wbr ?\/?>lee\u2011guang\u2011you\u2011729a12aa/);
+  assert.match(resume, /class="resume-url-solid"[^>]*>linkedin\.com\/in\/lee\u2011guang\u2011you\u2011729a12aa/);
+  assert.match(resume, /class="resume-url-break"/);
+  assert.doesNotMatch(resume, /www\.<wbr ?\/?>linkedin/);
+  assert.doesNotMatch(resume, /class="resume-url-solid"[^>]*>www\.linkedin/);
   assert.match(resume, /Full-Stack Engineer|Full\u2011Stack Engineer/);
   assert.match(resume, /Boon Siew Honda Sdn Bhd/);
   assert.doesNotMatch(resume, /Sdn\. Bhd\./);
