@@ -129,7 +129,7 @@ test("homepage keeps curated projects and resume stays focused when GitHub is un
       assert.equal(response.status, 200);
       const html = await response.text();
       if (pathname === "/") {
-        for (const slug of ["codex-board", "personal-resume-portfolio-website", "codex-workflow-toolkit"]) {
+        for (const slug of ["giliran", "myinvois-recon", "codex-board", "personal-resume-portfolio-website", "codex-workflow-toolkit"]) {
           assert.match(html, new RegExp(`href="(?:https://gy-portfolio\\.guangyou1386\\.chatgpt\\.site)?/projects/${slug}"`));
         }
       } else if (pathname === "/resume") {
@@ -520,6 +520,28 @@ test("profile writes require application/json", async () => {
     body: "{}",
   });
   assert.equal(charset.status, 401);
+});
+
+test("homepage lists giliran and myinvois-recon first, with source-linked project pages", async () => {
+  const home = await (await render("/")).text();
+  const giliranIdx = home.indexOf("/projects/giliran");
+  const reconIdx = home.indexOf("/projects/myinvois-recon");
+  const boardIdx = home.indexOf("/projects/codex-board");
+  assert.notEqual(giliranIdx, -1);
+  assert.notEqual(reconIdx, -1);
+  assert.notEqual(boardIdx, -1);
+  assert.ok(giliranIdx < reconIdx && reconIdx < boardIdx, "giliran should lead Selected work, then myinvois-recon, then the existing entries");
+
+  const giliran = await (await render("/projects/giliran")).text();
+  assert.match(giliran, /https:\/\/github\.com\/guangyou0716\/giliran/);
+  assert.match(giliran, /Server-Sent Events/);
+  assert.match(giliran, /Django 5\.2/);
+  assert.doesNotMatch(giliran, /Engineering decisions (?:&amp;|&) evidence/);
+
+  const recon = await (await render("/projects/myinvois-recon")).text();
+  assert.match(recon, /https:\/\/github\.com\/guangyou0716\/myinvois-recon/);
+  assert.match(recon, /never calls the MyInvois API/);
+  assert.doesNotMatch(recon, /Engineering decisions (?:&amp;|&) evidence/);
 });
 
 test("codex-board case study cites immutable source and other projects omit it", async () => {
