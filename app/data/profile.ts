@@ -192,6 +192,41 @@ export const experience: ExperienceItem[] = [
 
 export const projects: ProjectItem[] = [
   {
+    slug: "giliran",
+    title: "Giliran",
+    description: "Walk-in queue and appointment system for small clinics, pharmacies and service counters, with a live TV board, Server-Sent Events updates, and English, Bahasa Melayu and Simplified Chinese.",
+    type: "Web application",
+    status: "Public repository",
+    technologies: ["Django", "PostgreSQL", "Python"],
+    github: "https://github.com/guangyou0716/giliran",
+    featured: true,
+    overview: "Walk-in queue and appointment system for small clinics, pharmacies and service counters. Customers take a number or book a time slot on their phone; staff run each counter from a tablet or PC; a TV in the waiting room shows which number goes to which room. Live ticket and board pages are updated by Server-Sent Events, with polling as the fallback.",
+    built: [
+      "Phone join, live ticket page and TV display board",
+      "Appointments with check-in into the queue",
+      "Staff counter console, ticket transfer and counter pause",
+      "English, Bahasa Melayu and Simplified Chinese",
+    ],
+    architecture: ["Django 5.2", "PostgreSQL 16", "Docker Compose"],
+  },
+  {
+    slug: "myinvois-recon",
+    title: "MyInvois Recon",
+    description: "Offline TypeScript CLI that compares a sales or purchase ledger CSV with a MyInvois document list and reports invoices where the two disagree. It makes no network calls and needs no credentials.",
+    type: "Command-line tool",
+    status: "Public repository",
+    technologies: ["TypeScript", "Node.js"],
+    github: "https://github.com/guangyou0716/myinvois-recon",
+    featured: true,
+    overview: "Offline month-end check for Malaysian e-Invoicing. It compares a sales ledger export with a MyInvois document list, or a purchase ledger with supplier e-Invoices you received, and lists every invoice where the two disagree. Optional extras include a per-month summary of ledger vs Valid e-Invoice totals. It reads two local CSV files, never calls the MyInvois API, needs no credentials, and has no runtime dependencies.",
+    built: [
+      "Sales ledger vs MyInvois document comparison",
+      "Purchase (AP) ledger direction",
+      "Per-month totals and Markdown or CSV reports",
+    ],
+    architecture: ["TypeScript", "Node 20+", "Offline CSV"],
+  },
+  {
     slug: "codex-board", title: "codex-board", description: "React and TypeScript dashboard with a task board, repository management, Codex thread controls and usage monitoring.", type: "Developer tooling", status: "Public repository", technologies: ["React", "TypeScript"], github: "https://github.com/guangyou0716/codex-board", featured: true,
     overview: "React and TypeScript dashboard with a task board, repository management, Codex thread controls and usage monitoring.", built: ["Coding tasks", "Repository context", "Codex threads"], architecture: ["TypeScript", "Developer workflow", "Codex"],
     caseStudy: codexBoardCaseStudy,
