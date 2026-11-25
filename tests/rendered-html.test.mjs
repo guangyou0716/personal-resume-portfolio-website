@@ -129,7 +129,7 @@ test("homepage keeps curated projects and resume stays focused when GitHub is un
       assert.equal(response.status, 200);
       const html = await response.text();
       if (pathname === "/") {
-        for (const slug of ["giliran", "myinvois-recon", "codex-board", "personal-resume-portfolio-website", "codex-workflow-toolkit"]) {
+        for (const slug of ["giliran", "biliksewa", "myinvois-recon", "codex-board", "personal-resume-portfolio-website", "codex-workflow-toolkit"]) {
           assert.match(html, new RegExp(`href="(?:https://gy-portfolio\\.guangyou1386\\.chatgpt\\.site)?/projects/${slug}"`));
         }
       } else if (pathname === "/resume") {
@@ -542,6 +542,23 @@ test("homepage lists giliran and myinvois-recon first, with source-linked projec
   assert.match(recon, /https:\/\/github\.com\/guangyou0716\/myinvois-recon/);
   assert.match(recon, /never calls the MyInvois API/);
   assert.doesNotMatch(recon, /Engineering decisions (?:&amp;|&) evidence/);
+});
+
+test("biliksewa follows giliran in Selected work and links its source and live demo", async () => {
+  const home = await (await render("/")).text();
+  const giliranIdx = home.indexOf("/projects/giliran");
+  const biliksewaIdx = home.indexOf("/projects/biliksewa");
+  const reconIdx = home.indexOf("/projects/myinvois-recon");
+  assert.ok(giliranIdx !== -1 && giliranIdx < biliksewaIdx && biliksewaIdx < reconIdx, "biliksewa should sit between giliran and myinvois-recon");
+
+  const page = await render("/projects/biliksewa");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /https:\/\/github\.com\/guangyou0716\/biliksewa/);
+  assert.match(html, /href="https:\/\/biliksewa-demo\.guangyou\.workers\.dev"/);
+  assert.match(html, /Live demo/);
+  assert.match(html, /pro-rated by nights/);
+  assert.doesNotMatch(html, /Engineering decisions (?:&amp;|&) evidence/);
 });
 
 test("codex-board case study cites immutable source and other projects omit it", async () => {
