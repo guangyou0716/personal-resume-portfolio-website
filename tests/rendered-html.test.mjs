@@ -129,7 +129,7 @@ test("homepage keeps curated projects and resume stays focused when GitHub is un
       assert.equal(response.status, 200);
       const html = await response.text();
       if (pathname === "/") {
-        for (const slug of ["giliran", "biliksewa", "myinvois-recon", "codex-board", "personal-resume-portfolio-website", "codex-workflow-toolkit"]) {
+        for (const slug of ["giliran", "biliksewa", "kadkerja", "myinvois-recon", "codex-board", "personal-resume-portfolio-website", "codex-workflow-toolkit"]) {
           assert.match(html, new RegExp(`href="(?:https://gy-portfolio\\.guangyou1386\\.chatgpt\\.site)?/projects/${slug}"`));
         }
       } else if (pathname === "/resume") {
@@ -558,6 +558,23 @@ test("biliksewa follows giliran in Selected work and links its source and live d
   assert.match(html, /href="https:\/\/biliksewa-demo\.guangyou\.workers\.dev"/);
   assert.match(html, /Live demo/);
   assert.match(html, /pro-rated by nights/);
+  assert.doesNotMatch(html, /Engineering decisions (?:&amp;|&) evidence/);
+});
+
+test("kadkerja follows biliksewa and links its source and browser demo", async () => {
+  const home = await (await render("/")).text();
+  const biliksewaIdx = home.indexOf("/projects/biliksewa");
+  const kadkerjaIdx = home.indexOf("/projects/kadkerja");
+  const reconIdx = home.indexOf("/projects/myinvois-recon");
+  assert.ok(biliksewaIdx !== -1 && biliksewaIdx < kadkerjaIdx && kadkerjaIdx < reconIdx, "kadkerja should sit between biliksewa and myinvois-recon");
+
+  const page = await render("/projects/kadkerja");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /https:\/\/github\.com\/guangyou0716\/kadkerja/);
+  assert.match(html, /href="https:\/\/kadkerja-demo\.guangyou\.workers\.dev"/);
+  assert.match(html, /Browser demo/);
+  assert.match(html, /browser-only build/);
   assert.doesNotMatch(html, /Engineering decisions (?:&amp;|&) evidence/);
 });
 
